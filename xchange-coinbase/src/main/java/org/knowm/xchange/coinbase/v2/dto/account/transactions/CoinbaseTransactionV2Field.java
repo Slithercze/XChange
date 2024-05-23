@@ -20,6 +20,7 @@ public class CoinbaseTransactionV2Field {
     this.resource = resource;
     this.resourcePath = resourcePath;
     this.paymentMethodName = paymentMethodName;
+
   }
 
   @Override
