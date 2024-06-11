@@ -44,6 +44,7 @@ public class CoinmateTradeServiceRaw extends CoinmateBaseService {
 
   private final CoinmateDigest signatureCreator;
   private final CoinmateAuthenticated coinmateAuthenticated;
+  private static final String USER_AGENT = "Whalebooks/2024.05.311637 (https://whalebooks.com; support@whalebooks.com)";
 
   public CoinmateTradeServiceRaw(Exchange exchange) {
     super(exchange);
@@ -64,6 +65,7 @@ public class CoinmateTradeServiceRaw extends CoinmateBaseService {
       throws IOException {
     CoinmateTransactionHistory transactionHistory =
         coinmateAuthenticated.getTransactionHistory(
+            USER_AGENT,
             exchange.getExchangeSpecification().getApiKey(),
             exchange.getExchangeSpecification().getUserName(),
             signatureCreator,
@@ -91,6 +93,7 @@ public class CoinmateTradeServiceRaw extends CoinmateBaseService {
       throws IOException {
     CoinmateTradeHistory tradeHistory =
         coinmateAuthenticated.getTradeHistory(
+            USER_AGENT,
             exchange.getExchangeSpecification().getApiKey(),
             exchange.getExchangeSpecification().getUserName(),
             signatureCreator,

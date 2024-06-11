@@ -27,6 +27,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.math.BigDecimal;
 
 /** @author Martin Stachon */
+
 public class CoinmateTransactionHistoryEntry {
 
   private final long transactionId;
@@ -116,5 +117,23 @@ public class CoinmateTransactionHistoryEntry {
 
   public long getOrderId() {
     return orderId;
+  }
+
+  @Override
+  public String toString() {
+    return "{\"CoinmateTransactionHistoryEntry\":{"
+            + "\"transactionId\":\"" + transactionId + "\""
+            + ", \"timestamp\":\"" + timestamp + "\""
+            + ", \"transactionType\":\"" + transactionType + "\""
+            + ", \"amount\":\"" + amount + "\""
+            + ", \"amountCurrency\":\"" + amountCurrency + "\""
+            + ", \"price\":\"" + price + "\""
+            + ", \"priceCurrency\":\"" + priceCurrency + "\""
+            + ", \"fee\":\"" + fee + "\""
+            + ", \"feeCurrency\":\"" + feeCurrency + "\""
+            + ", \"description\":\"" + description + "\""
+            + ", \"status\":\"" + status + "\""
+            + ", \"orderId\":\"" + orderId + "\""
+            + "}}";
   }
 }

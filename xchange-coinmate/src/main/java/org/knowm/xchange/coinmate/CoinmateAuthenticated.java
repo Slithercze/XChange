@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -66,6 +67,7 @@ public interface CoinmateAuthenticated extends Coinmate {
   @POST
   @Path("transactionHistory")
   CoinmateTransactionHistory getTransactionHistory(
+      @HeaderParam("User-Agent") String userAgent,
       @FormParam("publicKey") String publicKey,
       @FormParam("clientId") String clientId,
       @FormParam("signature") ParamsDigest signer,
@@ -322,6 +324,7 @@ public interface CoinmateAuthenticated extends Coinmate {
   @POST
   @Path("tradeHistory")
   CoinmateTradeHistory getTradeHistory(
+      @HeaderParam("User-Agent") String userAgent,
       @FormParam("publicKey") String publicKey,
       @FormParam("clientId") String clientId,
       @FormParam("signature") ParamsDigest signer,
