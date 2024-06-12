@@ -10,6 +10,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.fasterxml.jackson.annotation.*;
 import org.knowm.xchange.currency.Currency;
 
 /**
@@ -29,21 +31,25 @@ public final class Wallet implements Serializable {
     /** You can do margin trading with funds allocated to this wallet */
     MARGIN_TRADING,
     /** You can fund other margin traders with funds allocated to this wallet to earn an interest */
-    MARGIN_FUNDING
+    MARGIN_FUNDING,
+    /** Wallet for futures platform*/
+    FUTURES_TRADING
   }
 
   /** The keys represent the currency of the wallet. */
   private final Map<Currency, Balance> balances;
+  /** Collection of balances for deserialization * */
+  private final Collection<Balance> balanceCollection;
   /** A unique identifier for this wallet */
-  private String id;
+  private final String id;
   /** A descriptive name for this wallet. Defaults to {@link #id} */
-  private String name;
+  private final String name;
   /** Features supported by this wallet */
   private final Set<WalletFeature> features;
   /** Maximum leverage for margin trading supported by this wallet */
-  private BigDecimal maxLeverage = BigDecimal.ZERO;
+  private final BigDecimal maxLeverage;
   /** Current leverage for margin trading done on this wallet */
-  private BigDecimal currentLeverage = BigDecimal.ZERO;
+  private final BigDecimal currentLeverage;
 
   /**
    * Constructs a {@link Wallet}.
@@ -55,12 +61,12 @@ public final class Wallet implements Serializable {
    *     <p>maxLeverage and currentLeverage are BigDecimal.ZERO for the default constructor
    */
   public Wallet(
-      String id,
-      String name,
-      Collection<Balance> balances,
-      Set<WalletFeature> features,
-      BigDecimal maxLeverage,
-      BigDecimal currentLeverage) {
+      @JsonProperty("id") String id,
+      @JsonProperty("name") String name,
+      @JsonProperty("balances") Collection<Balance> balances,
+      @JsonProperty("features") Set<WalletFeature> features,
+      @JsonProperty("maxLeverage") BigDecimal maxLeverage,
+      @JsonProperty("currentLeverage") BigDecimal currentLeverage) {
 
     this.id = id;
     if (name == null) {
@@ -68,6 +74,7 @@ public final class Wallet implements Serializable {
     } else {
       this.name = name;
     }
+    this.balanceCollection = balances;
     if (balances.size() == 0) {
       this.balances = Collections.emptyMap();
     } else if (balances.size() == 1) {
@@ -100,7 +107,15 @@ public final class Wallet implements Serializable {
     return name;
   }
 
+  /** @return The available colletion of balances */
+  @JsonGetter
+  public Collection<Balance> balances() {
+
+    return balanceCollection;
+  }
+
   /** @return The available balances (amount and currency) */
+  @JsonIgnore
   public Map<Currency, Balance> getBalances() {
 
     return Collections.unmodifiableMap(balances);
@@ -154,7 +169,7 @@ public final class Wallet implements Serializable {
   public String toString() {
     return "Wallet{"
         + "balances="
-        + balances
+        + balanceCollection
         + ", id='"
         + id
         + '\''
@@ -189,7 +204,7 @@ public final class Wallet implements Serializable {
       return new Builder().balances(balances);
     }
 
-    private Builder balances(Collection<Balance> balances) {
+    public Builder balances(Collection<Balance> balances) {
       this.balances = balances;
       return this;
     }

@@ -39,13 +39,7 @@ import org.knowm.xchange.coinmate.dto.marketdata.CoinmateTickerData;
 import org.knowm.xchange.coinmate.dto.marketdata.CoinmateTradeStatistics;
 import org.knowm.xchange.coinmate.dto.marketdata.CoinmateTransactions;
 import org.knowm.xchange.coinmate.dto.marketdata.CoinmateTransactionsEntry;
-import org.knowm.xchange.coinmate.dto.trade.CoinmateOpenOrders;
-import org.knowm.xchange.coinmate.dto.trade.CoinmateOpenOrdersEntry;
-import org.knowm.xchange.coinmate.dto.trade.CoinmateOrder;
-import org.knowm.xchange.coinmate.dto.trade.CoinmateTradeHistory;
-import org.knowm.xchange.coinmate.dto.trade.CoinmateTradeHistoryEntry;
-import org.knowm.xchange.coinmate.dto.trade.CoinmateTransactionHistory;
-import org.knowm.xchange.coinmate.dto.trade.CoinmateTransactionHistoryEntry;
+import org.knowm.xchange.coinmate.dto.trade.*;
 import org.knowm.xchange.currency.Currency;
 import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.dto.Order;
@@ -86,8 +80,7 @@ public class CoinmateAdapters {
     BigDecimal change = data.getChange();
     Date timestamp = new Date(data.getTimestamp() * 1000L);
 
-    return new Ticker.Builder()
-        .currencyPair(currencyPair)
+    return new Ticker.Builder().instrument(currencyPair)
         .last(last)
         .bid(bid)
         .ask(ask)
@@ -150,9 +143,11 @@ public class CoinmateAdapters {
     switch (type) {
       case "BUY":
       case "QUICK_BUY":
+      case "INSTANT_BUY":
         return Order.OrderType.BID;
       case "SELL":
       case "QUICK_SELL":
+      case "INSTANT_SELL":
         return Order.OrderType.ASK;
     }
     return null;
@@ -178,54 +173,45 @@ public class CoinmateAdapters {
 
   public static UserTrades adaptTransactionHistory(
       CoinmateTransactionHistory coinmateTradeHistory) {
-    List<UserTrade> trades = new ArrayList<>(coinmateTradeHistory.getData().size());
-
-    for (CoinmateTransactionHistoryEntry entry : coinmateTradeHistory.getData()) {
-
-      UserTrade trade =
-          new UserTrade.Builder()
-              .type(typeToOrderTypeOrNull(entry.getTransactionType()))
-              .originalAmount(entry.getAmount())
-              .currencyPair(
-                  CoinmateUtils.getPair(entry.getAmountCurrency() + "_" + entry.getPriceCurrency()))
-              .price(entry.getPrice())
-              .timestamp(new Date(entry.getTimestamp()))
-              .id(Long.toString(entry.getTransactionId()))
-              .orderId(Long.toString(entry.getOrderId()))
-              .feeAmount(entry.getFee())
-              .feeCurrency(Currency.getInstance(entry.getFeeCurrency()))
-              .build();
-      trades.add(trade);
-    }
+    List<UserTrade> trades = coinmateTradeHistory.getData().stream().map(
+          entry -> new UserTrade.Builder()
+            .type(typeToOrderTypeOrNull(entry.getTransactionType()))
+            .originalAmount(entry.getAmount())
+            .currencyPair(
+                CoinmateUtils.getPair(entry.getAmountCurrency() + "_" + entry.getPriceCurrency()))
+            .price(entry.getPrice())
+            .timestamp(new Date(entry.getTimestamp()))
+            .id(Long.toString(entry.getTransactionId()))
+            .orderId(Long.toString(entry.getOrderId()))
+            .feeAmount(entry.getFee())
+            .feeCurrency(Currency.getInstance(entry.getFeeCurrency()))
+            .build()
+        )
+        .collect(Collectors.toCollection(() -> new ArrayList<>(coinmateTradeHistory.getData().size())));
 
     return new UserTrades(trades, Trades.TradeSortType.SortByTimestamp);
   }
 
   public static UserTrades adaptTradeHistory(CoinmateTradeHistory coinmateTradeHistory) {
-    List<UserTrade> trades = new ArrayList<>(coinmateTradeHistory.getData().size());
-
-    for (CoinmateTradeHistoryEntry entry : coinmateTradeHistory.getData()) {
-
-      UserTrade trade =
-          new UserTrade.Builder()
-              .type(typeToOrderTypeOrNull(entry.getType()))
-              .originalAmount(entry.getAmount())
-              .currencyPair(CoinmateUtils.getPair(entry.getCurrencyPair()))
-              .price(entry.getPrice())
-              .timestamp(new Date(entry.getCreatedTimestamp()))
-              .id(Long.toString(entry.getTransactionId()))
-              .orderId(Long.toString(entry.getOrderId()))
-              .feeAmount(entry.getFee())
-              .feeCurrency(CoinmateUtils.getPair(entry.getCurrencyPair()).counter)
-              .build();
-      trades.add(trade);
-    }
+    List<UserTrade> trades = coinmateTradeHistory.getData().stream().map(entry -> new UserTrade.Builder()
+          .type(typeToOrderTypeOrNull(entry.getType()))
+          .originalAmount(entry.getAmount())
+          .currencyPair(CoinmateUtils.getPair(entry.getCurrencyPair()))
+          .price(entry.getPrice())
+          .timestamp(new Date(entry.getCreatedTimestamp()))
+          .id(Long.toString(entry.getTransactionId()))
+          .orderId(Long.toString(entry.getOrderId()))
+          .feeAmount(entry.getFee())
+          .feeCurrency(CoinmateUtils.getPair(entry.getCurrencyPair()).counter)
+          .build()
+        )
+        .collect(Collectors.toCollection(() -> new ArrayList<>(coinmateTradeHistory.getData().size())));
 
     return new UserTrades(trades, Trades.TradeSortType.SortByTimestamp);
   }
 
   public static List<FundingRecord> adaptFundingHistory(
-      CoinmateTransactionHistory coinmateTradeHistory) {
+      CoinmateTransactionHistory coinmateTradeHistory, CoinmateTransferHistory additionalTransferData) {
     List<FundingRecord> fundings = new ArrayList<>();
 
     for (CoinmateTransactionHistoryEntry entry : coinmateTradeHistory.getData()) {
@@ -276,10 +262,21 @@ public class CoinmateAdapters {
             description.replace(
                 feeCurrency + ": ", ""); // the transaction hash is in the description
       }
+      String address = null;
+      String addressTag = null;
+      if (entry.getTransactionType().equals("WITHDRAWAL") || entry.getTransactionType().equals("DEPOSIT")) {
+        for (CoinmateTransferHistoryEntry transfer : additionalTransferData.getData()) {
+          if (transfer != null && transfer.getId() == entry.getTransactionId()) {
+            address = transfer.getDestination();
+            addressTag = transfer.getDestinationTag();
+          }
+        }
+      }
 
       FundingRecord funding =
           new FundingRecord(
-              null,
+              address,
+              addressTag,
               new Date(entry.getTimestamp()),
               Currency.getInstance(entry.getAmountCurrency()),
               entry.getAmount(),
@@ -290,6 +287,65 @@ public class CoinmateAdapters {
               null,
               entry.getFee(),
               description);
+
+      fundings.add(funding);
+    }
+
+    return fundings;
+  }
+
+  public static List<FundingRecord> adaptTransferHistory(CoinmateTransferHistory transferHistory) {
+    List<FundingRecord> fundings = new ArrayList<>();
+
+    for (CoinmateTransferHistoryEntry entry : transferHistory.getData()) {
+      FundingRecord.Type type;
+      FundingRecord.Status status;
+
+      switch (entry.getTransferType()) {
+        case "WITHDRAWAL":
+        case "CREATE_VOUCHER":
+          type = FundingRecord.Type.WITHDRAWAL;
+          break;
+        case "DEPOSIT":
+        case "USED_VOUCHER":
+        case "NEW_USER_REWARD":
+        case "REFERRAL":
+          type = FundingRecord.Type.DEPOSIT;
+          break;
+        default:
+          type = FundingRecord.Type.DEPOSIT;
+      }
+
+      switch (entry.getTransferStatus().toUpperCase()) {
+        case "OK":
+        case "COMPLETED":
+          status = FundingRecord.Status.COMPLETE;
+          break;
+        case "NEW":
+        case "SENT":
+        case "CREATED":
+        case "WAITING":
+        case "PENDING":
+          status = FundingRecord.Status.PROCESSING;
+          break;
+        default:
+          status = FundingRecord.Status.FAILED;
+      }
+
+      FundingRecord funding =
+              new FundingRecord(
+                      entry.getDestination(),
+                      entry.getDestinationTag(),
+                      new Date(entry.getTimestamp()),
+                      Currency.getInstance(entry.getAmountCurrency()),
+                      entry.getAmount(),
+                      String.valueOf(entry.getId()),
+                      null,
+                      type,
+                      status,
+                      null,
+                      entry.getFee(),
+                      null);
 
       fundings.add(funding);
     }
@@ -377,7 +433,7 @@ public class CoinmateAdapters {
    * @return
    */
   public static Order adaptOrder(
-      CoinmateOrder coinmateOrder, Function<String, CoinmateOrder> orderByIdFetcher)
+      CoinmateOrderHistoryEntry coinmateOrder, Function<String, CoinmateOrderHistoryEntry> orderByIdFetcher)
       throws CoinmateException {
 
     Order.OrderType orderType;
@@ -410,37 +466,37 @@ public class CoinmateAdapters {
     BigDecimal originalAmount;
     BigDecimal remainingAmount;
     BigDecimal averagePrice;
+    BigDecimal cumulativeAmount;
 
     if (orderStatus == Order.OrderStatus.STOPPED) {
       // fetch generated market order and get its average price and amount
-      CoinmateOrder marketOrderRaw = orderByIdFetcher.apply(coinmateOrder.getStopLossOrderId());
+      CoinmateOrderHistoryEntry marketOrderRaw = orderByIdFetcher.apply(coinmateOrder.getStopLossOrderId());
       if (marketOrderRaw == null) {
         throw new CoinmateException("Failed to fetch market order generated by stoploss order.");
       }
       averagePrice = marketOrderRaw.getAvgPrice();
       originalAmount = marketOrderRaw.getOriginalAmount();
       remainingAmount = marketOrderRaw.getRemainingAmount();
+      cumulativeAmount = marketOrderRaw.getCumulativeAmount();
     } else {
       averagePrice = coinmateOrder.getAvgPrice();
       originalAmount = coinmateOrder.getOriginalAmount();
       remainingAmount = coinmateOrder.getRemainingAmount();
+      cumulativeAmount = coinmateOrder.getCumulativeAmount();
     }
 
     // TODO: we can probably use `orderTradeType` to distinguish between Market and Limit order
-    Order order =
-        new MarketOrder(
+    return new MarketOrder(
             orderType,
             originalAmount,
             null,
             Long.toString(coinmateOrder.getId()),
             new Date(coinmateOrder.getTimestamp()),
             averagePrice,
-            getCumulativeAmount(originalAmount, remainingAmount),
+            cumulativeAmount == null ? getCumulativeAmount(originalAmount, remainingAmount) : cumulativeAmount,
             null,
             orderStatus,
             null);
-
-    return order;
   }
 
   public static Ticker adaptTradeStatistics(
