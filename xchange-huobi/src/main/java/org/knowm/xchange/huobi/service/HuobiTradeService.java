@@ -39,7 +39,7 @@ public class HuobiTradeService extends HuobiTradeServiceRaw implements TradeServ
       currencyPair = ((TradeHistoryParamCurrencyPair) tradeHistoryParams).getCurrencyPair();
     }
     if (currencyPair == null) {
-      throw new IllegalArgumentException("Currency pair is required.");
+      throw new IllegalArgumentException("Currency pair is required");
     }
     Date startDate;
     Date endDate;
