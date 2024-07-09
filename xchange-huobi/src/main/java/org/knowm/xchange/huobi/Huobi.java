@@ -3,6 +3,7 @@ package org.knowm.xchange.huobi;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
+
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
@@ -67,16 +68,8 @@ public interface Huobi {
       throws IOException;
 
   @GET
-  @Path("v1/common/symbols")
-  HuobiAssetPairsResult getAssetPairs() throws IOException;
-
-  @GET
   @Path("v2/settings/common/symbols")
   HuobiAssetPairsResult getAssetPairsV2() throws IOException;
-
-  @GET
-  @Path("v1/common/currencys")
-  HuobiAssetsResult getAssets() throws IOException;
 
   @GET
   @Path("v2/settings/common/currencies")
