@@ -37,7 +37,7 @@ public class HuobiMarketDataServiceRaw extends HuobiBaseService {
   }
 
   public HuobiAssetPair[] getHuobiAssetPairs() throws IOException {
-    HuobiAssetPairsResult assetPairsResult = huobi.getAssetPairs();
+    HuobiAssetPairsResult assetPairsResult = huobi.getAssetPairsV2();
     return checkResult(assetPairsResult);
   }
 

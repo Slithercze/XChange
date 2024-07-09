@@ -71,8 +71,16 @@ public interface Huobi {
   HuobiAssetPairsResult getAssetPairs() throws IOException;
 
   @GET
+  @Path("v2/settings/common/symbols")
+  HuobiAssetPairsResult getAssetPairsV2() throws IOException;
+
+  @GET
   @Path("v1/common/currencys")
   HuobiAssetsResult getAssets() throws IOException;
+
+  @GET
+  @Path("v2/settings/common/currencies")
+  HuobiAssetsResult getAssetsV2() throws IOException;
 
   @GET
   @Path("v1/fee/fee-rate/get")

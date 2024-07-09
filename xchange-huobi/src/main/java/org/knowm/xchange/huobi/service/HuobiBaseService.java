@@ -52,7 +52,7 @@ public class HuobiBaseService extends BaseExchangeService implements BaseService
   }
 
   public HuobiAsset[] getHuobiAssets() throws IOException {
-    HuobiAssetsResult assetsResult = huobi.getAssets();
+    HuobiAssetsResult assetsResult = huobi.getAssetsV2();
     return checkResult(assetsResult);
   }
 }
