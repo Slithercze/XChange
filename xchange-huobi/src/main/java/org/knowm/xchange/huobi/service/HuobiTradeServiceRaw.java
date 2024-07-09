@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import org.knowm.xchange.Exchange;
-import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.dto.Order.OrderType;
 import org.knowm.xchange.dto.trade.LimitOrder;
 import org.knowm.xchange.dto.trade.MarketOrder;
@@ -32,18 +31,17 @@ public class HuobiTradeServiceRaw extends HuobiBaseService {
 
   // https://huobiapi.github.io/docs/spot/v1/en/#search-past-orders
   public HuobiOrder[] getHuobiTradeHistory(
-      CurrencyPair currencyPair, Date startDate, Date endDate, String startId) throws IOException {
+      String currencyPair, Date startDate, Date endDate, String startId) throws IOException {
     String tradeStates = "partial-filled,partial-canceled,filled";
     HuobiOrdersResult result =
         huobi.getOrders(
-            HuobiUtils.createHuobiCurrencyPair(currencyPair),
+            currencyPair,
             tradeStates,
-            null, // System.currentTimeMillis() - 48 * 60 * 60_000L,
-            null,
-            startDate == null ? null : DATE_FORMAT.format(startDate),
-            endDate == null ? null : DATE_FORMAT.format(endDate),
+            startDate == null ? null : startDate.getTime(),
+            endDate == null ? null : endDate.getTime(),
             startId,
             null,
+            100,
             exchange.getExchangeSpecification().getApiKey(),
             HuobiDigest.HMAC_SHA_256,
             2,

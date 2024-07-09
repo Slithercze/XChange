@@ -23,6 +23,7 @@ public class HuobiUtils {
       new HashMap<CurrencyPair, String>();
   private static Map<String, Currency> assetMap = new HashMap<String, Currency>();
   private static Map<Currency, String> assetMapReverse = new HashMap<Currency, String>();
+  private static HuobiAssetPair[] huobiSymbolPairs;
 
   private HuobiUtils() {}
 
@@ -67,6 +68,14 @@ public class HuobiUtils {
         assetPairMapReverse.put(pair, entry.getKey());
       }
     }
+  }
+
+  public static void putHuobiSymbolPairs(HuobiAssetPair[] huobiAssetPairs) {
+    huobiSymbolPairs = huobiAssetPairs;
+  }
+
+  public static HuobiAssetPair[] getHuobiSymbolPairs() {
+    return huobiSymbolPairs;
   }
 
   public static Currency translateHuobiCurrencyCode(String currencyIn) {

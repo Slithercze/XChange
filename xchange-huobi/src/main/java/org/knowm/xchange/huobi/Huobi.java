@@ -67,11 +67,11 @@ public interface Huobi {
       throws IOException;
 
   @GET
-  @Path("v1/common/symbols")
+  @Path("v2/settings/common/symbols")
   HuobiAssetPairsResult getAssetPairs() throws IOException;
 
   @GET
-  @Path("v1/common/currencys")
+  @Path("v2/settings/common/currencies")
   HuobiAssetsResult getAssets() throws IOException;
 
   @GET
@@ -219,10 +219,9 @@ public interface Huobi {
       @QueryParam("states") String states,
       @QueryParam("start-time") Long startTime,
       @QueryParam("end-time") Long endTime,
-      @QueryParam("start-date") String startDate,
-      @QueryParam("end-date") String endDate,
       @QueryParam("from") String from,
       @QueryParam("direct") String direct,
+      @QueryParam("size") Integer size,
       @QueryParam("AccessKeyId") String apiKey,
       @QueryParam("SignatureMethod") String signatureMethod,
       @QueryParam("SignatureVersion") int signatureVersion,

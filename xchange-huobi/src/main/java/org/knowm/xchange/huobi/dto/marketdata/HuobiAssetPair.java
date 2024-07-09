@@ -9,7 +9,6 @@ public class HuobiAssetPair {
   private final String quoteCurrency;
   private final Integer pricePrecision;
   private final Integer amountPrecision;
-  private final String symbolPartition;
   private final String symbol;
   private final String state;
   private final Integer valuePrecision;
@@ -24,12 +23,11 @@ public class HuobiAssetPair {
   private final String apiTrading;
 
   public HuobiAssetPair(
-      @JsonProperty("base-currency") String baseCurrency,
-      @JsonProperty("quote-currency") String quoteCurrency,
-      @JsonProperty("price-precision") Integer pricePrecision,
-      @JsonProperty("amount-precision") Integer amountPrecision,
-      @JsonProperty("symbol-partition") String symbolPartition,
-      @JsonProperty("symbol") String symbol,
+      @JsonProperty("bc") String baseCurrency,
+      @JsonProperty("qc") String quoteCurrency,
+      @JsonProperty("tpp") Integer pricePrecision,
+      @JsonProperty("tap") Integer amountPrecision,
+      @JsonProperty("sc") String symbol,
       @JsonProperty("state") String state,
       @JsonProperty("value-precision") Integer valuePrecision,
       @JsonProperty("min-order-amt") BigDecimal minOrderAmount,
@@ -45,7 +43,6 @@ public class HuobiAssetPair {
     this.quoteCurrency = quoteCurrency;
     this.pricePrecision = pricePrecision;
     this.amountPrecision = amountPrecision;
-    this.symbolPartition = symbolPartition;
     this.symbol = symbol;
     this.state = state;
     this.valuePrecision = valuePrecision;
@@ -78,10 +75,6 @@ public class HuobiAssetPair {
 
   public Integer getAmountPrecision() {
     return amountPrecision;
-  }
-
-  private String getSymbolPartition() {
-    return symbolPartition;
   }
 
   public String getSymbol() {
@@ -145,9 +138,6 @@ public class HuobiAssetPair {
         + pricePrecision
         + ", amountPrecision="
         + amountPrecision
-        + ", symbolPartition='"
-        + symbolPartition
-        + '\''
         + ", symbol='"
         + symbol
         + '\''
