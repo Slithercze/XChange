@@ -1,157 +1,140 @@
 {
-  "currency_pairs": {
-    "XRP/EUR": {
-      "price_scale": 5,
-      "min_amount": 1,
-      "base_scale": 8
+  "currency_pairs" : {
+    "DASH/BTC" : {
+      "price_scale" : 5,
+      "min_amount" : 0.001
     },
-    "BTC/USDT": {
-      "price_scale": 1,
-      "min_amount": 0.0001,
-      "base_scale": 8
+    "DASH/CZK" : {
+      "price_scale" : 1,
+      "min_amount" : 0.001
     },
-    "USDT/EUR": {
-      "price_scale": 4,
-      "min_amount": 1,
-      "base_scale": 2
+    "ETH/DAI" : {
+      "price_scale" : 2,
+      "min_amount" : 0.001
     },
-    "ETH/BTC": {
-      "price_scale": 5,
-      "min_amount": 0.001,
-      "base_scale": 8
+    "XRP/EUR" : {
+      "price_scale" : 5,
+      "min_amount" : 1
     },
-    "LTC/BTC": {
-      "price_scale": 6,
-      "min_amount": 0.01,
-      "base_scale": 8
+    "BCH/EUR" : {
+      "price_scale" : 2,
+      "min_amount" : 0.001
     },
-    "ADA/CZK": {
-      "price_scale": 4,
-      "min_amount": 1,
-      "base_scale": 6
+    "ETH/BTC" : {
+      "price_scale" : 5,
+      "min_amount" : 0.001
     },
-    "ETH/CZK": {
-      "price_scale": 1,
-      "min_amount": 0.001,
-      "base_scale": 8
+    "LTC/BTC" : {
+      "price_scale" : 6,
+      "min_amount" : 0.01
     },
-    "SOL/CZK": {
-      "price_scale": 4,
-      "min_amount": 0.01,
-      "base_scale": 8
+    "ADA/CZK" : {
+      "price_scale" : 4,
+      "min_amount" : 1
     },
-    "BTC/CZK": {
-      "price_scale": 0,
-      "min_amount": 0.0001,
-      "base_scale": 8
+    "ETH/CZK" : {
+      "price_scale" : 1,
+      "min_amount" : 0.001
     },
-    "XRP/CZK": {
-      "price_scale": 4,
-      "min_amount": 1,
-      "base_scale": 8
+    "SOL/CZK" : {
+      "price_scale" : 4,
+      "min_amount" : 0.01
     },
-    "LTC/CZK": {
-      "price_scale": 1,
-      "min_amount": 0.01,
-      "base_scale": 8
+    "BTC/CZK" : {
+      "price_scale" : 0,
+      "min_amount" : 0.0001
     },
-    "XRP/BTC": {
-      "price_scale": 8,
-      "min_amount": 1,
-      "base_scale": 8
+    "BCH/CZK" : {
+      "price_scale" : 1,
+      "min_amount" : 0.001
     },
-    "ADA/EUR": {
-      "price_scale": 5,
-      "min_amount": 1,
-      "base_scale": 6
+    "DASH/EUR" : {
+      "price_scale" : 2,
+      "min_amount" : 0.001
     },
-    "LTC/EUR": {
-      "price_scale": 2,
-      "min_amount": 0.01,
-      "base_scale": 8
+    "DAI/EUR" : {
+      "price_scale" : 4,
+      "min_amount" : 1
     },
-    "SOL/EUR": {
-      "price_scale": 5,
-      "min_amount": 0.01,
-      "base_scale": 8
+    "XRP/CZK" : {
+      "price_scale" : 4,
+      "min_amount" : 1
     },
-    "USDT/CZK": {
-      "price_scale": 3,
-      "min_amount": 1,
-      "base_scale": 2
+    "BCH/BTC" : {
+      "price_scale" : 5,
+      "min_amount" : 0.001
     },
-    "BTC/EUR": {
-      "price_scale": 1,
-      "min_amount": 0.0001,
-      "base_scale": 8
+    "BTC/DAI" : {
+      "price_scale" : 2,
+      "min_amount" : 0.0001
     },
-    "ETH/EUR": {
-      "price_scale": 2,
-      "min_amount": 0.001,
-      "base_scale": 8
+    "LTC/CZK" : {
+      "price_scale" : 1,
+      "min_amount" : 0.01
+    },
+    "XRP/BTC" : {
+      "price_scale" : 8,
+      "min_amount" : 1
+    },
+    "LTC/EUR" : {
+      "price_scale" : 2,
+      "min_amount" : 0.01
+    },
+    "ADA/EUR" : {
+      "price_scale" : 5,
+      "min_amount" : 1
+    },
+    "SOL/EUR" : {
+      "price_scale" : 5,
+      "min_amount" : 0.01
+    },
+    "BTC/EUR" : {
+      "price_scale" : 1,
+      "min_amount" : 0.0001
+    },
+    "ETH/EUR" : {
+      "price_scale" : 2,
+      "min_amount" : 0.001
     }
   },
-  "currencies": {
-    "EUR": {
-      "scale": 2
+  "currencies" : {
+    "BTC" : {
+      "scale" : 8
     },
-    "BCH": {
-      "scale": 8
+    "SOL" : {
+      "scale" : 8
     },
-    "USD": {
-      "scale": 2
+    "EUR" : {
+      "scale" : 2
     },
-    "USDT": {
-      "scale": 2
+    "CZK" : {
+      "scale" : 2
     },
-    "DASH": {
-      "scale": 8
+    "BCH" : {
+      "scale" : 8
     },
-    "DAI": {
-      "scale": 2
+    "XRP" : {
+      "scale" : 8
     },
-    "BTC": {
-      "scale": 8
+    "ETH" : {
+      "scale" : 8
     },
-    "SOL": {
-      "scale": 8
+    "LTC" : {
+      "scale" : 8
     },
-    "PLN": {
-      "scale": 2
+    "DASH" : {
+      "scale" : 8
     },
-    "GBP": {
-      "scale": 2
+    "DAI" : {
+      "scale" : 2
     },
-    "CZK": {
-      "scale": 2
-    },
-    "XRP": {
-      "scale": 8
-    },
-    "ETH": {
-      "scale": 8
-    },
-    "HUF": {
-      "scale": 2
-    },
-    "LTC": {
-      "scale": 8
-    },
-    "TRX": {
-      "scale": 8
-    },
-    "ADA": {
-      "scale": 6
-    },
-    "LUNA": {
-      "scale": 8
+    "ADA" : {
+      "scale" : 6
     }
   },
-  "private_rate_limits": [
-    {
-      "calls": 100,
-      "time_unit": "minutes"
-    }
-  ],
-  "share_rate_limits": true
+  "private_rate_limits" : [ {
+    "calls" : 100,
+    "time_unit" : "minutes"
+  } ],
+  "share_rate_limits" : true
 }

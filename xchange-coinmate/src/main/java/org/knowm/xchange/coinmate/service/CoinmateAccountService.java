@@ -235,6 +235,35 @@ public class CoinmateAccountService extends CoinmateAccountServiceRaw implements
         coinmateTransactionHistory, coinmateTransferHistory);
   }
 
+  public List<FundingRecord> getTransfersHistory(TradeHistoryParams params) throws IOException {
+    TradeHistoryParamsSorted.Order order = TradeHistoryParamsSorted.Order.asc;
+    Integer limit = 1000;
+    Long timestampFrom = null;
+    Long timestampTo = null;
+
+    if (params instanceof TradeHistoryParamLimit) {
+      limit = ((TradeHistoryParamLimit) params).getLimit();
+    }
+
+    if (params instanceof TradeHistoryParamsSorted) {
+      order = ((TradeHistoryParamsSorted) params).getOrder();
+    }
+
+    if (params instanceof TradeHistoryParamsTimeSpan) {
+      TradeHistoryParamsTimeSpan thpts = (TradeHistoryParamsTimeSpan) params;
+      if (thpts.getStartTime() != null) {
+        timestampFrom = thpts.getStartTime().getTime();
+      }
+      if (thpts.getEndTime() != null) {
+        timestampTo = thpts.getEndTime().getTime();
+      }
+    }
+    CoinmateTransferHistory coinmateTransferHistory =
+            getCoinmateTransferHistory(limit, null, CoinmateAdapters.adaptSortOrder(order), timestampFrom, timestampTo, null);
+
+    return CoinmateAdapters.adaptTransferHistory(coinmateTransferHistory);
+  }
+
   public static class CoinmateFundingHistoryParams
       extends CoinmateTradeService.CoinmateTradeHistoryHistoryParams {}
 }

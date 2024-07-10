@@ -42,6 +42,16 @@ public class CoinmateUtils {
         + instrument.getCounter().getCurrencyCode().toUpperCase();
   }
 
+//  public static String getPair(CurrencyPair currencyPair) {
+//    if (currencyPair == null) {
+//      return null;
+//    }
+//    return currencyPair.base.getCurrencyCode().toUpperCase()
+//            + "_"
+//            + currencyPair.counter.getCurrencyCode().toUpperCase();
+//  }
+
+
   public static CurrencyPair getPair(String currencyPair) {
     return new CurrencyPair(currencyPair.replace("_", "/"));
   }

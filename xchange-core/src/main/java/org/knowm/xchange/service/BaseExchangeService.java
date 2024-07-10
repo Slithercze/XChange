@@ -30,7 +30,7 @@ public abstract class BaseExchangeService<E extends Exchange> {
     BigDecimal price = limitOrder.getLimitPrice().stripTrailingZeros();
 
     if (price.scale()
-        > exchangeMetaData.getInstruments().get(limitOrder.getCurrencyPair()).getPriceScale()) {
+        > exchangeMetaData.getInstruments().get(limitOrder.getInstrument()).getPriceScale()) {
       throw new IllegalArgumentException("Unsupported price scale " + price.scale());
     }
   }
@@ -42,7 +42,8 @@ public abstract class BaseExchangeService<E extends Exchange> {
 
   protected final void verifyOrder(Order order, ExchangeMetaData exchangeMetaData) {
 
-    InstrumentMetaData metaData = exchangeMetaData.getInstruments().get(order.getCurrencyPair());
+    InstrumentMetaData metaData =
+        exchangeMetaData.getInstruments().get(order.getInstrument());
     if (metaData == null) {
       throw new IllegalArgumentException("Invalid CurrencyPair");
     }
