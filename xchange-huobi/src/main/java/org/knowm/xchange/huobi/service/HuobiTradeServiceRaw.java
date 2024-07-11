@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import org.knowm.xchange.Exchange;
-import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.dto.Order.OrderType;
 import org.knowm.xchange.dto.trade.LimitOrder;
 import org.knowm.xchange.dto.trade.MarketOrder;
@@ -32,55 +31,54 @@ public class HuobiTradeServiceRaw extends HuobiBaseService {
 
   // https://huobiapi.github.io/docs/spot/v1/en/#search-past-orders
   public HuobiOrder[] getHuobiTradeHistory(
-      CurrencyPair currencyPair, Date startDate, Date endDate, String startId) throws IOException {
+          String currencyPair, Date startDate, Date endDate, String startId) throws IOException {
     String tradeStates = "partial-filled,partial-canceled,filled";
     HuobiOrdersResult result =
-        huobi.getOrders(
-            HuobiUtils.createHuobiCurrencyPair(currencyPair),
-            tradeStates,
-            null, // System.currentTimeMillis() - 48 * 60 * 60_000L,
-            null,
-            startDate == null ? null : DATE_FORMAT.format(startDate),
-            endDate == null ? null : DATE_FORMAT.format(endDate),
-            startId,
-            null,
-            exchange.getExchangeSpecification().getApiKey(),
-            HuobiDigest.HMAC_SHA_256,
-            2,
-            HuobiUtils.createUTCDate(exchange.getNonceFactory()),
-            signatureCreator);
+            huobi.getOrders(
+                    currencyPair,
+                    tradeStates,
+                    startDate == null ? null : startDate.getTime(),
+                    endDate == null ? null : endDate.getTime(),
+                    startId,
+                    null,
+                    100,
+                    exchange.getExchangeSpecification().getApiKey(),
+                    HuobiDigest.HMAC_SHA_256,
+                    2,
+                    HuobiUtils.createUTCDate(exchange.getNonceFactory()),
+                    signatureCreator);
     return checkResult(result);
   }
 
   public HuobiOrder[] getHuobiOrderHistory(
-      CurrencyPairParam params, Date startTime, Date endTime, String direct, Integer size)
-      throws IOException {
+          CurrencyPairParam params, Date startTime, Date endTime, String direct, Integer size)
+          throws IOException {
     HuobiOrdersResult result =
-        huobi.getOrdersHistory(
-            params != null ? HuobiUtils.createHuobiCurrencyPair(params.getCurrencyPair()) : null,
-            startTime != null ? startTime.getTime() : null,
-            endTime != null ? endTime.getTime() : null,
-            direct,
-            size,
-            exchange.getExchangeSpecification().getApiKey(),
-            HuobiDigest.HMAC_SHA_256,
-            2,
-            HuobiUtils.createUTCDate(exchange.getNonceFactory()),
-            signatureCreator);
+            huobi.getOrdersHistory(
+                    params != null ? HuobiUtils.createHuobiCurrencyPair(params.getCurrencyPair()) : null,
+                    startTime != null ? startTime.getTime() : null,
+                    endTime != null ? endTime.getTime() : null,
+                    direct,
+                    size,
+                    exchange.getExchangeSpecification().getApiKey(),
+                    HuobiDigest.HMAC_SHA_256,
+                    2,
+                    HuobiUtils.createUTCDate(exchange.getNonceFactory()),
+                    signatureCreator);
     return checkResult(result);
   }
 
   public HuobiOrder[] getHuobiOpenOrders(CurrencyPairParam params) throws IOException {
     String states = "pre-submitted,submitted,partial-filled";
     HuobiOrdersResult result =
-        huobi.getOpenOrders(
-            params != null ? HuobiUtils.createHuobiCurrencyPair(params.getCurrencyPair()) : null,
-            states,
-            exchange.getExchangeSpecification().getApiKey(),
-            HuobiDigest.HMAC_SHA_256,
-            2,
-            HuobiUtils.createUTCDate(exchange.getNonceFactory()),
-            signatureCreator);
+            huobi.getOpenOrders(
+                    params != null ? HuobiUtils.createHuobiCurrencyPair(params.getCurrencyPair()) : null,
+                    states,
+                    exchange.getExchangeSpecification().getApiKey(),
+                    HuobiDigest.HMAC_SHA_256,
+                    2,
+                    HuobiUtils.createUTCDate(exchange.getNonceFactory()),
+                    signatureCreator);
     return checkResult(result);
   }
 

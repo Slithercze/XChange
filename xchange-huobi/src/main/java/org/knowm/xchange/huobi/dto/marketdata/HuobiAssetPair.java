@@ -9,7 +9,6 @@ public class HuobiAssetPair {
   private final String quoteCurrency;
   private final Integer pricePrecision;
   private final Integer amountPrecision;
-  private final String symbolPartition;
   private final String symbol;
   private final String state;
   private final Integer valuePrecision;
@@ -24,28 +23,26 @@ public class HuobiAssetPair {
   private final String apiTrading;
 
   public HuobiAssetPair(
-      @JsonProperty("base-currency") String baseCurrency,
-      @JsonProperty("quote-currency") String quoteCurrency,
-      @JsonProperty("price-precision") Integer pricePrecision,
-      @JsonProperty("amount-precision") Integer amountPrecision,
-      @JsonProperty("symbol-partition") String symbolPartition,
-      @JsonProperty("symbol") String symbol,
-      @JsonProperty("state") String state,
-      @JsonProperty("value-precision") Integer valuePrecision,
-      @JsonProperty("min-order-amt") BigDecimal minOrderAmount,
-      @JsonProperty("max-order-amt") BigDecimal maxOrderAmount,
-      @JsonProperty("min-order-value") BigDecimal minOrderValue,
-      @JsonProperty("limit-order-min-order-amt") BigDecimal limitOrderMinOrderAmt,
-      @JsonProperty("limit-order-max-order-amt") BigDecimal limitOrderMaxOrderAmt,
-      @JsonProperty("sell-market-min-order-amt") BigDecimal sellMarketMinOrderAmt,
-      @JsonProperty("sell-market-max-order-amt") BigDecimal sellMarketMaxOrderAmt,
-      @JsonProperty("buy-market-max-order-value") BigDecimal buyMarketMaxOrderValue,
-      @JsonProperty("api-trading") String apiTrading) {
+          @JsonProperty("bc") String baseCurrency,
+          @JsonProperty("qc") String quoteCurrency,
+          @JsonProperty("tpp") Integer pricePrecision,
+          @JsonProperty("tap") Integer amountPrecision,
+          @JsonProperty("sc") String symbol,
+          @JsonProperty("state") String state,
+          @JsonProperty("value-precision") Integer valuePrecision,
+          @JsonProperty("min-order-amt") BigDecimal minOrderAmount,
+          @JsonProperty("max-order-amt") BigDecimal maxOrderAmount,
+          @JsonProperty("min-order-value") BigDecimal minOrderValue,
+          @JsonProperty("limit-order-min-order-amt") BigDecimal limitOrderMinOrderAmt,
+          @JsonProperty("limit-order-max-order-amt") BigDecimal limitOrderMaxOrderAmt,
+          @JsonProperty("sell-market-min-order-amt") BigDecimal sellMarketMinOrderAmt,
+          @JsonProperty("sell-market-max-order-amt") BigDecimal sellMarketMaxOrderAmt,
+          @JsonProperty("buy-market-max-order-value") BigDecimal buyMarketMaxOrderValue,
+          @JsonProperty("api-trading") String apiTrading) {
     this.baseCurrency = baseCurrency;
     this.quoteCurrency = quoteCurrency;
     this.pricePrecision = pricePrecision;
     this.amountPrecision = amountPrecision;
-    this.symbolPartition = symbolPartition;
     this.symbol = symbol;
     this.state = state;
     this.valuePrecision = valuePrecision;
@@ -78,10 +75,6 @@ public class HuobiAssetPair {
 
   public Integer getAmountPrecision() {
     return amountPrecision;
-  }
-
-  private String getSymbolPartition() {
-    return symbolPartition;
   }
 
   public String getSymbol() {
@@ -135,46 +128,43 @@ public class HuobiAssetPair {
   @Override
   public String toString() {
     return "HuobiAssetPair ["
-        + "baseCurrency='"
-        + baseCurrency
-        + '\''
-        + ", quoteCurrency='"
-        + quoteCurrency
-        + '\''
-        + ", pricePrecision="
-        + pricePrecision
-        + ", amountPrecision="
-        + amountPrecision
-        + ", symbolPartition='"
-        + symbolPartition
-        + '\''
-        + ", symbol='"
-        + symbol
-        + '\''
-        + ", state='"
-        + state
-        + '\''
-        + ", valuePrecision="
-        + valuePrecision
-        + ", minOrderAmount="
-        + minOrderAmount
-        + ", maxOrderAmount="
-        + maxOrderAmount
-        + ", minOrderValue="
-        + minOrderValue
-        + ", limitOrderMinOrderAmt="
-        + limitOrderMinOrderAmt
-        + ", limitOrderMaxOrderAmt="
-        + limitOrderMaxOrderAmt
-        + ", sellMarketMinOrderAmt="
-        + sellMarketMinOrderAmt
-        + ", sellMarketMaxOrderAmt="
-        + sellMarketMaxOrderAmt
-        + ", buyMarketMaxOrderValue="
-        + buyMarketMaxOrderValue
-        + ", apiTrading='"
-        + apiTrading
-        + '\''
-        + ']';
+            + "baseCurrency='"
+            + baseCurrency
+            + '\''
+            + ", quoteCurrency='"
+            + quoteCurrency
+            + '\''
+            + ", pricePrecision="
+            + pricePrecision
+            + ", amountPrecision="
+            + amountPrecision
+            + ", symbol='"
+            + symbol
+            + '\''
+            + ", state='"
+            + state
+            + '\''
+            + ", valuePrecision="
+            + valuePrecision
+            + ", minOrderAmount="
+            + minOrderAmount
+            + ", maxOrderAmount="
+            + maxOrderAmount
+            + ", minOrderValue="
+            + minOrderValue
+            + ", limitOrderMinOrderAmt="
+            + limitOrderMinOrderAmt
+            + ", limitOrderMaxOrderAmt="
+            + limitOrderMaxOrderAmt
+            + ", sellMarketMinOrderAmt="
+            + sellMarketMinOrderAmt
+            + ", sellMarketMaxOrderAmt="
+            + sellMarketMaxOrderAmt
+            + ", buyMarketMaxOrderValue="
+            + buyMarketMaxOrderValue
+            + ", apiTrading='"
+            + apiTrading
+            + '\''
+            + ']';
   }
 }

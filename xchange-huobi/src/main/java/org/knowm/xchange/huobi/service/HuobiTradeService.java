@@ -57,6 +57,30 @@ public class HuobiTradeService extends HuobiTradeServiceRaw implements TradeServ
       startId = null;
     }
 
+    HuobiOrder[] tradeHistory = getHuobiTradeHistory(String.valueOf(currencyPair), startDate, endDate, startId);
+    return HuobiAdapters.adaptTradeHistory(tradeHistory);
+  }
+
+  public UserTrades getTradeHistory(TradeHistoryParams tradeHistoryParams, String currencyPair) throws IOException {
+    if (currencyPair == null) {
+      throw new IllegalArgumentException("Currency pair is required.");
+    }
+    Date startDate;
+    Date endDate;
+    if (tradeHistoryParams instanceof TradeHistoryParamsTimeSpan) {
+      startDate = ((TradeHistoryParamsTimeSpan) tradeHistoryParams).getStartTime();
+      endDate = ((TradeHistoryParamsTimeSpan) tradeHistoryParams).getEndTime();
+    } else {
+      startDate = null;
+      endDate = null;
+    }
+    String startId;
+    if (tradeHistoryParams instanceof TradeHistoryParamsIdSpan) {
+      startId = ((TradeHistoryParamsIdSpan) tradeHistoryParams).getStartId();
+    } else {
+      startId = null;
+    }
+
     HuobiOrder[] tradeHistory = getHuobiTradeHistory(currencyPair, startDate, endDate, startId);
     return HuobiAdapters.adaptTradeHistory(tradeHistory);
   }

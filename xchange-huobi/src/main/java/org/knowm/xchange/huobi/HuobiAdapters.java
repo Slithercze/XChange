@@ -89,6 +89,7 @@ public class HuobiAdapters {
 
     HuobiUtils.setHuobiAssets(assets);
     HuobiUtils.setHuobiAssetPairs(assetPairs);
+    HuobiUtils.putHuobiSymbolPairs(assetPairs);
 
     Map<Instrument, InstrumentMetaData> pairsMetaData = staticMetaData.getInstruments();
     Map<Instrument, InstrumentMetaData> pairs = new HashMap<>();
