@@ -166,6 +166,8 @@ public class BinanceAdapters {
       currencyPair = new CurrencyPair(symbol.substring(0, pairLength - 4), "USDS");
     } else if (symbol.endsWith("BUSD")) {
       currencyPair = new CurrencyPair(symbol.substring(0, pairLength - 4), "BUSD");
+    } else if (symbol.endsWith("FDUSD")) {
+      currencyPair = new CurrencyPair(symbol.substring(0, pairLength - 5), "FDUSD");
     } else {
       currencyPair = new CurrencyPair(
           symbol.substring(0, pairLength - 3), symbol.substring(pairLength - 3));
