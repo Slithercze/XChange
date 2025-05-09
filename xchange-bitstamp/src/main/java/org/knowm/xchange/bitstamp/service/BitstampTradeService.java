@@ -136,7 +136,8 @@ public class BitstampTradeService extends BitstampTradeServiceRaw implements Tra
             : BitstampAuthenticatedV2.Side.sell;
     BitstampOrder bitstampOrder =
         placeBitstampOrder(
-            order.getCurrencyPair(), side, order.getOriginalAmount(), order.getLimitPrice());
+            order.getCurrencyPair(), side, order.getOriginalAmount(), order.getLimitPrice()
+        );
     if (bitstampOrder.getErrorMessage() != null) {
       throw new ExchangeException(bitstampOrder.getErrorMessage());
     }
