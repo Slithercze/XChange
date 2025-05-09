@@ -266,12 +266,11 @@ public final class BitstampAdapters {
   public static Map.Entry<String, BigDecimal> findNonzeroAmount(BitstampUserTransaction transaction)
       throws ExchangeException {
     for (Map.Entry<String, BigDecimal> entry : transaction.getAmounts().entrySet()) {
-      if (entry.getValue().abs().compareTo(new BigDecimal(1e-6)) == 1) {
+      if (entry.getValue().abs().compareTo(new BigDecimal("1e-6")) > 0) {
         return entry;
       }
     }
-    throw new ExchangeException(
-        "Could not find non-zero amount in transaction (id: " + transaction.getId() + ")");
+    return null;
   }
 
   public static List<FundingRecord> adaptFundingHistory(
@@ -281,6 +280,10 @@ public final class BitstampAdapters {
       if (trans.isDeposit() || trans.isWithdrawal() || trans.isSubAccountTransfer()) {
 
         Map.Entry<String, BigDecimal> amount = BitstampAdapters.findNonzeroAmount(trans);
+
+        if (amount == null) {
+          continue;
+        }
 
         FundingRecord.Type type = FundingRecord.Type.DEPOSIT;
 
