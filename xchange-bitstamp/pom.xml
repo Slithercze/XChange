@@ -34,12 +34,6 @@
             <groupId>org.knowm.xchange</groupId>
             <artifactId>xchange-core</artifactId>
             <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.github.mmazi</groupId>
-                    <artifactId>rescu</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>
