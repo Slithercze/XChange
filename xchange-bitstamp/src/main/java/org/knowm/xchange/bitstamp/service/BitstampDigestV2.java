@@ -1,6 +1,6 @@
 package org.knowm.xchange.bitstamp.service;
 
-import jakarta.ws.rs.HeaderParam;
+import javax.ws.rs.HeaderParam;
 import java.math.BigInteger;
 import javax.crypto.Mac;
 import org.knowm.xchange.service.BaseParamsDigest;
