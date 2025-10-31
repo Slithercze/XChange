@@ -1,6 +1,6 @@
 package org.knowm.xchange.okex.service;
 
-import jakarta.ws.rs.NotSupportedException;
+import javax.ws.rs.NotSupportedException;
 import org.knowm.xchange.client.ResilienceRegistries;
 import org.knowm.xchange.derivative.FuturesContract;
 import org.knowm.xchange.derivative.OptionsContract;

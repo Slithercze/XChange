@@ -1,6 +1,6 @@
 package org.knowm.xchange.okex;
 
-import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 import java.io.IOException;
 import java.util.Arrays;
