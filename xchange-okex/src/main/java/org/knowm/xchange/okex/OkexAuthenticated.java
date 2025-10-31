@@ -30,6 +30,8 @@ import org.knowm.xchange.okex.dto.account.OkexTradeFee;
 import org.knowm.xchange.okex.dto.account.OkexWalletBalance;
 import org.knowm.xchange.okex.dto.account.OkexAccountInstruments;
 import org.knowm.xchange.okex.dto.account.OkexWithdrawalRequest;
+import org.knowm.xchange.okex.dto.account.OkexWithdrawal;
+import org.knowm.xchange.okex.dto.account.OkexDeposit;
 import org.knowm.xchange.okex.dto.account.OkexWithdrawalResponse;
 import org.knowm.xchange.okex.dto.account.PiggyBalance;
 import org.knowm.xchange.okex.dto.marketdata.OkexCurrency;
@@ -54,6 +56,8 @@ public interface OkexAuthenticated extends Okex {
   String currenciesPath = "/asset/currencies"; // Stated as 6 req/sec
   String assetBalancesPath = "/asset/balances"; // Stated as 6 req/sec
   String assetWithdrawalPath = "/asset/withdrawal"; // Stated as 6 req/sec
+  String assetWithdrawalHistoryPath = "/asset/withdrawal-history"; // Stated as 6 req/sec
+  String assetDepositHistoryPath = "/asset/deposit-history"; // Stated as 6 req/sec
   String positionsPath = "/account/positions"; // Stated as 10 req/2 sec
   String accountPositionAtRiskPath = "/account/account-position-risk"; // Stated as 10 req/2 sec
   String setLeveragePath = "/account/set-leverage"; // Stated as 20 req/2 sec
@@ -79,6 +83,8 @@ public interface OkexAuthenticated extends Okex {
           put(balancePath, Arrays.asList(5, 1));
           put(currenciesPath, Arrays.asList(6, 1));
           put(assetBalancesPath, Arrays.asList(6, 1));
+          put(assetWithdrawalHistoryPath, Arrays.asList(6, 1));
+          put(assetDepositHistoryPath, Arrays.asList(6, 1));
           put(positionsPath, Arrays.asList(5, 1));
           put(setLeveragePath, Arrays.asList(20, 2));
           put(pendingOrdersPath, Arrays.asList(20, 2));
@@ -172,6 +178,36 @@ public interface OkexAuthenticated extends Okex {
       @HeaderParam("X-SIMULATED-TRADING") String simulatedTrading,
       OkexChangeMarginRequest requestPayload)
       throws OkexException, IOException;
+
+  @GET
+  @Path(assetDepositHistoryPath)
+  OkexResponse<List<OkexDeposit>> getDepositHistory(
+          @QueryParam("ccy") String ccy,
+          @QueryParam("after") String after,     // ms
+          @QueryParam("before") String before,   // ms
+          @QueryParam("limit") String limit,
+          @QueryParam("state") String state,
+          @HeaderParam("OK-ACCESS-KEY") String apiKey,
+          @HeaderParam("OK-ACCESS-SIGN") ParamsDigest signature,
+          @HeaderParam("OK-ACCESS-TIMESTAMP") String timestamp,
+          @HeaderParam("OK-ACCESS-PASSPHRASE") String passphrase,
+          @HeaderParam("X-SIMULATED-TRADING") String simulatedTrading
+  );
+
+  @GET
+  @Path(assetWithdrawalHistoryPath)
+  OkexResponse<List<OkexWithdrawal>> getWithdrawalHistory(
+          @QueryParam("ccy") String ccy,
+          @QueryParam("after") String after,     // ms
+          @QueryParam("before") String before,   // ms
+          @QueryParam("limit") String limit,
+          @QueryParam("state") String state,
+          @HeaderParam("OK-ACCESS-KEY") String apiKey,
+          @HeaderParam("OK-ACCESS-SIGN") ParamsDigest signature,
+          @HeaderParam("OK-ACCESS-TIMESTAMP") String timestamp,
+          @HeaderParam("OK-ACCESS-PASSPHRASE") String passphrase,
+          @HeaderParam("X-SIMULATED-TRADING") String simulatedTrading
+  );
 
   @GET
   @Path(ordersHistoryPath)

@@ -18,6 +18,8 @@ import org.knowm.xchange.okex.dto.account.OkexAssetBalance;
 import org.knowm.xchange.okex.dto.account.OkexBillDetails;
 import org.knowm.xchange.okex.dto.account.OkexChangeMarginRequest;
 import org.knowm.xchange.okex.dto.account.OkexChangeMarginResponse;
+import org.knowm.xchange.okex.dto.account.OkexDeposit;
+import org.knowm.xchange.okex.dto.account.OkexWithdrawal;
 import org.knowm.xchange.okex.dto.account.OkexDepositAddress;
 import org.knowm.xchange.okex.dto.account.OkexSetLeverageRequest;
 import org.knowm.xchange.okex.dto.account.OkexSetLeverageResponse;
@@ -267,6 +269,66 @@ public class OkexAccountServiceRaw extends OkexBaseService {
                                               .getExchangeSpecification()
                                               .getExchangeSpecificParametersItem(PARAM_SIMULATED)))
               .withRateLimiter(rateLimiter(OkexAuthenticated.instrumentsPath))
+              .call();
+    } catch (OkexException e) {
+      throw handleError(e);
+    }
+  }
+
+  public OkexResponse<List<OkexWithdrawal>> getWithdrawalHistory(
+          String ccy, String after, String before)
+          throws IOException, OkexException {
+    try {
+      return decorateApiCall(
+              () ->
+                      okexAuthenticated.getWithdrawalHistory(
+                              ccy,
+                              after,
+                              before,
+                              "100",
+                              "2",
+                              exchange.getExchangeSpecification().getApiKey(),
+                              signatureCreator,
+                              DateUtils.toUTCISODateString(new Date()),
+                              (String)
+                                      exchange
+                                              .getExchangeSpecification()
+                                              .getExchangeSpecificParametersItem(PARAM_PASSPHRASE),
+                              (String)
+                                      exchange
+                                              .getExchangeSpecification()
+                                              .getExchangeSpecificParametersItem(PARAM_SIMULATED)))
+              .withRateLimiter(rateLimiter(OkexAuthenticated.assetWithdrawalHistoryPath))
+              .call();
+    } catch (OkexException e) {
+      throw handleError(e);
+    }
+  }
+
+  public OkexResponse<List<OkexDeposit>> getDepositHistory(
+          String ccy, String after, String before)
+          throws IOException, OkexException {
+    try {
+      return decorateApiCall(
+              () ->
+                      okexAuthenticated.getDepositHistory(
+                              ccy,
+                              after,
+                              before,
+                              "100",
+                              "2",
+                              exchange.getExchangeSpecification().getApiKey(),
+                              signatureCreator,
+                              DateUtils.toUTCISODateString(new Date()),
+                              (String)
+                                      exchange
+                                              .getExchangeSpecification()
+                                              .getExchangeSpecificParametersItem(PARAM_PASSPHRASE),
+                              (String)
+                                      exchange
+                                              .getExchangeSpecification()
+                                              .getExchangeSpecificParametersItem(PARAM_SIMULATED)))
+              .withRateLimiter(rateLimiter(OkexAuthenticated.assetDepositHistoryPath))
               .call();
     } catch (OkexException e) {
       throw handleError(e);
