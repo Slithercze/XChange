@@ -21,6 +21,7 @@ import org.knowm.xchange.okex.dto.account.OkexChangeMarginResponse;
 import org.knowm.xchange.okex.dto.account.OkexDepositAddress;
 import org.knowm.xchange.okex.dto.account.OkexSetLeverageRequest;
 import org.knowm.xchange.okex.dto.account.OkexSetLeverageResponse;
+import org.knowm.xchange.okex.dto.account.OkexAccountInstruments;
 import org.knowm.xchange.okex.dto.account.OkexTradeFee;
 import org.knowm.xchange.okex.dto.account.OkexWalletBalance;
 import org.knowm.xchange.okex.dto.account.OkexWithdrawalRequest;
@@ -239,6 +240,34 @@ public class OkexAccountServiceRaw extends OkexBaseService {
                               .getExchangeSpecificParametersItem(PARAM_SIMULATED)))
           .withRateLimiter(rateLimiter(OkexAuthenticated.tradeFeePath))
           .call();
+    } catch (OkexException e) {
+      throw handleError(e);
+    }
+  }
+
+  public OkexResponse<List<OkexAccountInstruments>> getAccountInstruments(
+          String instrumentType, String instrumentId, String instFamily)
+          throws IOException, OkexException {
+    try {
+      return decorateApiCall(
+              () ->
+                      okexAuthenticated.getAccountInstruments(
+                              instrumentType,
+                              instrumentId,
+                              instFamily,
+                              exchange.getExchangeSpecification().getApiKey(),
+                              signatureCreator,
+                              DateUtils.toUTCISODateString(new Date()),
+                              (String)
+                                      exchange
+                                              .getExchangeSpecification()
+                                              .getExchangeSpecificParametersItem(PARAM_PASSPHRASE),
+                              (String)
+                                      exchange
+                                              .getExchangeSpecification()
+                                              .getExchangeSpecificParametersItem(PARAM_SIMULATED)))
+              .withRateLimiter(rateLimiter(OkexAuthenticated.instrumentsPath))
+              .call();
     } catch (OkexException e) {
       throw handleError(e);
     }

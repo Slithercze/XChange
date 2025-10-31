@@ -28,6 +28,7 @@ import org.knowm.xchange.okex.dto.account.OkexSetLeverageRequest;
 import org.knowm.xchange.okex.dto.account.OkexSetLeverageResponse;
 import org.knowm.xchange.okex.dto.account.OkexTradeFee;
 import org.knowm.xchange.okex.dto.account.OkexWalletBalance;
+import org.knowm.xchange.okex.dto.account.OkexAccountInstruments;
 import org.knowm.xchange.okex.dto.account.OkexWithdrawalRequest;
 import org.knowm.xchange.okex.dto.account.OkexWithdrawalResponse;
 import org.knowm.xchange.okex.dto.account.PiggyBalance;
@@ -36,6 +37,7 @@ import org.knowm.xchange.okex.dto.subaccount.OkexSubAccountDetails;
 import org.knowm.xchange.okex.dto.trade.OkexAmendOrderRequest;
 import org.knowm.xchange.okex.dto.trade.OkexCancelOrderRequest;
 import org.knowm.xchange.okex.dto.trade.OkexOrderDetails;
+import org.knowm.xchange.okex.dto.trade.OkexFill;
 import org.knowm.xchange.okex.dto.trade.OkexOrderRequest;
 import org.knowm.xchange.okex.dto.trade.OkexOrderResponse;
 import si.mazi.rescu.ParamsDigest;
@@ -47,6 +49,7 @@ public interface OkexAuthenticated extends Okex {
   String tradeFeePath = "/account/trade-fee"; // Stated as 5 req/2 sec
   String configPath = "/account/config"; // Stated as 5 req/2 sec
   String getBillsPath = "/account/bills"; // Stated as 6 req/sec
+  String instrumentsPath = "/account/instruments"; // Stated as 6 req/sec
   String changeMarginPath = "/account/position/margin-balance"; // Stated as 20 req/2 sec
   String currenciesPath = "/asset/currencies"; // Stated as 6 req/sec
   String assetBalancesPath = "/asset/balances"; // Stated as 6 req/sec
@@ -63,7 +66,8 @@ public interface OkexAuthenticated extends Okex {
   String amendOrderPath = "/trade/amend-order"; // Stated as 60 req/2 sec
   String amendBatchOrderPath = "trade/amend-batch-orders"; // Stated as 300 req/2 sec
   String depositAddressPath = "/asset/deposit-address"; // Stated as 6 req/sec
-  String ordersHistoryPath = "/trade/orders-history"; // Stated as 40 req/2 sec
+  String ordersHistoryPath = "/trade/orders-history-archive"; // Stated as 40 req/2 sec
+  String fillsHistoryPath = "/trade/fills-history"; // Stated as 40 req/2 sec
   String subAccountList = "/users/subaccount/list"; // Stated as 2 req/2 sec
   String subAccountBalance = "/account/subaccount/balances"; // Stated as 2 req/2 sec
   String piggyBalance = "/asset/piggy-balance"; // Stated as 6 req/1 sec
@@ -86,9 +90,11 @@ public interface OkexAuthenticated extends Okex {
           put(amendOrderPath, Arrays.asList(60, 2));
           put(amendBatchOrderPath, Arrays.asList(300, 2));
           put(depositAddressPath, Arrays.asList(6, 1));
-          put(ordersHistoryPath, Arrays.asList(40, 2));
+          put(ordersHistoryPath, Arrays.asList(20, 2));
+          put(fillsHistoryPath, Arrays.asList(10, 2));
           put(tradeFeePath, Arrays.asList(5, 2));
           put(configPath, Arrays.asList(5, 2));
+          put(instrumentsPath, Arrays.asList(20, 2));
           put(getBillsPath, Arrays.asList(6, 1));
           put(changeMarginPath, Arrays.asList(20, 2));
           put(subAccountList, Arrays.asList(2, 2));
@@ -120,6 +126,19 @@ public interface OkexAuthenticated extends Okex {
       @HeaderParam("OK-ACCESS-PASSPHRASE") String passphrase,
       @HeaderParam("X-SIMULATED-TRADING") String simulatedTrading)
       throws OkexException, IOException;
+
+  @GET
+  @Path(instrumentsPath)
+  OkexResponse<List<OkexAccountInstruments>> getAccountInstruments(
+          @QueryParam("instType") String instrumentType,
+          @QueryParam("instFamily") String instFamily,
+          @QueryParam("instId") String instrumentId,
+          @HeaderParam("OK-ACCESS-KEY") String apiKey,
+          @HeaderParam("OK-ACCESS-SIGN") ParamsDigest signature,
+          @HeaderParam("OK-ACCESS-TIMESTAMP") String timestamp,
+          @HeaderParam("OK-ACCESS-PASSPHRASE") String passphrase,
+          @HeaderParam("X-SIMULATED-TRADING") String simulatedTrading)
+          throws OkexException, IOException;
 
   @GET
   @Path(getBillsPath)
@@ -164,6 +183,18 @@ public interface OkexAuthenticated extends Okex {
       @QueryParam("after") String after,
       @QueryParam("before") String before,
       @QueryParam("limit") String limit,
+      @HeaderParam("OK-ACCESS-KEY") String apiKey,
+      @HeaderParam("OK-ACCESS-SIGN") ParamsDigest signature,
+      @HeaderParam("OK-ACCESS-TIMESTAMP") String timestamp,
+      @HeaderParam("OK-ACCESS-PASSPHRASE") String passphrase,
+      @HeaderParam("X-SIMULATED-TRADING") String simulatedTrading);
+
+  @GET
+  @Path(fillsHistoryPath)
+  OkexResponse<List<OkexFill>> getFillHistory(
+      @QueryParam("instType") String instType,
+      @QueryParam("after") String after,
+      @QueryParam("before") String before,
       @HeaderParam("OK-ACCESS-KEY") String apiKey,
       @HeaderParam("OK-ACCESS-SIGN") ParamsDigest signature,
       @HeaderParam("OK-ACCESS-TIMESTAMP") String timestamp,

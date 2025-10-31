@@ -1,15 +1,6 @@
 package org.knowm.xchange.okex.service;
 
-import static org.knowm.xchange.okex.dto.OkexInstType.OPTION;
-import static org.knowm.xchange.okex.dto.OkexInstType.SPOT;
-import static org.knowm.xchange.okex.dto.OkexInstType.SWAP;
-
 import jakarta.ws.rs.NotSupportedException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.knowm.xchange.client.ResilienceRegistries;
 import org.knowm.xchange.derivative.FuturesContract;
 import org.knowm.xchange.derivative.OptionsContract;
@@ -27,6 +18,7 @@ import org.knowm.xchange.okex.dto.OkexException;
 import org.knowm.xchange.okex.dto.OkexResponse;
 import org.knowm.xchange.okex.dto.trade.OkexCancelOrderRequest;
 import org.knowm.xchange.okex.dto.trade.OkexOrderDetails;
+import org.knowm.xchange.okex.dto.trade.OkexTradeHistoryParamsV5;
 import org.knowm.xchange.okex.dto.trade.OkexOrderResponse;
 import org.knowm.xchange.okex.dto.trade.OkexTradeParams;
 import org.knowm.xchange.service.trade.TradeService;
@@ -36,10 +28,22 @@ import org.knowm.xchange.service.trade.params.CancelOrderByUserReferenceParams;
 import org.knowm.xchange.service.trade.params.CancelOrderParams;
 import org.knowm.xchange.service.trade.params.TradeHistoryParamInstrument;
 import org.knowm.xchange.service.trade.params.TradeHistoryParams;
+import org.knowm.xchange.service.trade.params.TradeHistoryParamLimit;
+import org.knowm.xchange.service.trade.params.TradeHistoryParamsTimeSpan;
 import org.knowm.xchange.service.trade.params.orders.OpenOrdersParamInstrument;
 import org.knowm.xchange.service.trade.params.orders.OpenOrdersParams;
 import org.knowm.xchange.service.trade.params.orders.OrderQueryParamInstrument;
 import org.knowm.xchange.service.trade.params.orders.OrderQueryParams;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.knowm.xchange.okex.dto.OkexInstType.SPOT;
+import static org.knowm.xchange.okex.dto.OkexInstType.SWAP;
+import static org.knowm.xchange.okex.dto.OkexInstType.OPTION;
 
 /** Author: Max Gao (gaamox@tutanota.com) Created: 08-06-2021 */
 public class OkexTradeService extends OkexTradeServiceRaw implements TradeService {
@@ -55,31 +59,57 @@ public class OkexTradeService extends OkexTradeServiceRaw implements TradeServic
 
   @Override
   public UserTrades getTradeHistory(TradeHistoryParams params) throws IOException {
-    if (params instanceof TradeHistoryParamInstrument) {
-      Instrument instrument = ((TradeHistoryParamInstrument) params).getInstrument();
-
-      String instrumentType = SPOT.name();
-      if (instrument instanceof FuturesContract) {
-        instrumentType = SWAP.name();
-      } else if (instrument instanceof OptionsContract) {
-        instrumentType = OPTION.name();
-      }
-
-      return OkexAdapters.adaptUserTrades(
-          getOrderHistory(
-                  instrumentType,
-                  OkexAdapters.adaptInstrument(
-                      ((TradeHistoryParamInstrument) params).getInstrument()),
-                  null,
-                  null,
-                  null,
-                  null)
-              .getData(),
-          exchange.getExchangeMetaData());
-    } else {
-      throw new NotSupportedException(
-          "TradeHistoryParams must implement " + TradeHistoryParamInstrument.class.getSimpleName());
+    if (!(params instanceof TradeHistoryParamInstrument)) {
+      throw new NotSupportedException("TradeHistoryParams must implement " +
+              TradeHistoryParamInstrument.class.getSimpleName());
     }
+
+    Instrument instrument = ((TradeHistoryParamInstrument) params).getInstrument();
+
+    String instrumentType = SPOT.name();
+    if (instrument instanceof FuturesContract) {
+      instrumentType = SWAP.name();
+    } else if (instrument instanceof OptionsContract) {
+      instrumentType = OPTION.name();
+    }
+
+    String instId = OkexAdapters.adaptInstrument(instrument);
+
+    String after = null, before = null, limit = null, ordType = null;
+
+    if (params instanceof TradeHistoryParamsTimeSpan) {
+      TradeHistoryParamsTimeSpan ts = (TradeHistoryParamsTimeSpan) params;
+      if (ts.getStartTime() != null) {
+        after = String.valueOf(ts.getStartTime().getTime());
+      }
+      if (ts.getEndTime() != null) {
+        before = String.valueOf(ts.getEndTime().getTime());
+      }
+    }
+
+    if (params instanceof TradeHistoryParamLimit) {
+      TradeHistoryParamLimit lim = (TradeHistoryParamLimit) params;
+      if (lim.getLimit() != null) {
+        limit = String.valueOf(lim.getLimit());
+      }
+    }
+
+    if (params instanceof OkexTradeHistoryParamsV5) {
+      OkexTradeHistoryParamsV5 okx = (OkexTradeHistoryParamsV5) params;
+      ordType = okx.getOrderType();
+    }
+
+    List<OkexOrderDetails> data =
+            getOrderHistory(
+                    instrumentType,
+                    instId,
+                    ordType,
+                    after,
+                    before,
+                    limit
+            ).getData();
+
+    return OkexAdapters.adaptUserTrades(data, exchange.getExchangeMetaData());
   }
 
   @Override
