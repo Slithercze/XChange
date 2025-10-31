@@ -2,11 +2,6 @@ package org.knowm.xchange.okex;
 
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.HeaderParam;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -20,6 +15,8 @@ import org.knowm.xchange.okex.dto.marketdata.OkexInstrument;
 import org.knowm.xchange.okex.dto.marketdata.OkexOrderbook;
 import org.knowm.xchange.okex.dto.marketdata.OkexTicker;
 import org.knowm.xchange.okex.dto.marketdata.OkexTrade;
+
+import javax.ws.rs.*;
 
 @Path("/api/v5")
 @Produces(APPLICATION_JSON)
