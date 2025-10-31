@@ -13,7 +13,6 @@
 
     <name>XChange Okex</name>
     <description>XChange implementation for Okex</description>
-
     <url>http://knowm.org/open-source/xchange/</url>
     <inceptionYear>2021</inceptionYear>
 
@@ -22,15 +21,42 @@
         <url>http://knowm.org/open-source/xchange/</url>
     </organization>
 
-    <!-- Parent provides default configuration for dependencies -->
     <dependencies>
-
         <dependency>
             <groupId>org.knowm.xchange</groupId>
             <artifactId>xchange-core</artifactId>
             <version>${project.version}</version>
         </dependency>
 
+        <!-- Add Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.34</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Ensure Lombok annotation processing is enabled for Maven builds -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <source>11</source>
+                    <target>11</target>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>1.18.34</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
