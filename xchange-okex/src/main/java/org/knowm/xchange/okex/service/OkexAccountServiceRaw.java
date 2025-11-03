@@ -6,8 +6,12 @@ import static org.knowm.xchange.okex.OkexExchange.PARAM_SIMULATED;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+
 import org.knowm.xchange.client.ResilienceRegistries;
 import org.knowm.xchange.currency.Currency;
+import org.knowm.xchange.dto.account.Fee;
+import org.knowm.xchange.instrument.Instrument;
 import org.knowm.xchange.okex.OkexAuthenticated;
 import org.knowm.xchange.okex.OkexExchange;
 import org.knowm.xchange.okex.dto.OkexException;
@@ -33,7 +37,7 @@ import org.knowm.xchange.okex.dto.subaccount.OkexSubAccountDetails;
 import org.knowm.xchange.utils.DateUtils;
 
 /** Author: Max Gao (gaamox@tutanota.com) Created: 08-06-2021 */
-public class OkexAccountServiceRaw extends OkexBaseService {
+public abstract class OkexAccountServiceRaw extends OkexBaseService {
 
   public static final String INTERNAL_METHOD = "3";
   public static final String ON_CHAIN_METHOD = "4";
@@ -509,4 +513,9 @@ public class OkexAccountServiceRaw extends OkexBaseService {
         .withRateLimiter(rateLimiter(OkexAuthenticated.subAccountList))
         .call();
   }
+
+  public abstract Map<Instrument, Fee> getDynamicTradingFeesByInstrument(String... category)
+      throws IOException;
+
+  public abstract boolean setLeverage(Instrument instrument, int leverage) throws IOException;
 }

@@ -80,32 +80,39 @@ public class OkexAdapters {
   private static final String FUTURES_WALLET_ID = "futures";
 
   public static UserTrades adaptUserTrades(
-      List<OkexOrderDetails> okexTradeHistory, ExchangeMetaData exchangeMetaData) {
-    List<UserTrade> userTradeList = new ArrayList<>();
+          List<OkexOrderDetails> okexTradeHistory, ExchangeMetaData exchangeMetaData) {
 
-    okexTradeHistory.forEach(
-        okexOrderDetails -> {
-          Instrument instrument = adaptOkexInstrumentId(okexOrderDetails.getInstrumentId());
-          userTradeList.add(
-              UserTrade.builder()
-                  .originalAmount(
-                      convertContractSizeToVolume(
-                          new BigDecimal(okexOrderDetails.getAmount()),
-                          instrument,
-                          exchangeMetaData.getInstruments().get(instrument).getContractValue()))
-                  .instrument(instrument)
-                  .price(new BigDecimal(okexOrderDetails.getAverageFilledPrice()))
-                  .type(adaptOkexOrderSideToOrderType(okexOrderDetails.getSide()))
-                  .id(okexOrderDetails.getOrderId())
-                  .orderId(okexOrderDetails.getOrderId())
-                  .timestamp(
-                      Date.from(
-                          Instant.ofEpochMilli(Long.parseLong(okexOrderDetails.getUpdateTime()))))
-                  .feeAmount(new BigDecimal(okexOrderDetails.getFee()))
-                  .feeCurrency(new Currency(okexOrderDetails.getFeeCurrency()))
-                  .orderUserReference(okexOrderDetails.getClientOrderId())
-                  .build());
-        });
+    List<UserTrade> userTradeList = new ArrayList<>(okexTradeHistory.size());
+
+    for (OkexOrderDetails d : okexTradeHistory) {
+      Instrument instrument = adaptOkexInstrumentId(d.getInstrumentId());
+      BigDecimal contractValue =
+              exchangeMetaData.getInstruments().get(instrument).getContractValue();
+
+      BigDecimal amount = convertContractSizeToVolume(
+              new BigDecimal(d.getAmount()), instrument, contractValue);
+
+      Date ts = Date.from(Instant.ofEpochMilli(Long.parseLong(d.getUpdateTime())));
+      OrderType type = adaptOkexOrderSideToOrderType(d.getSide());
+      BigDecimal price = new BigDecimal(d.getAverageFilledPrice());
+
+      UserTrade ut = new UserTrade(
+              type,
+              amount,
+              instrument,
+              price,
+              ts,
+              d.getOrderId(),     // trade id
+              null,               // makerOrderId
+              null,               // takerOrderId
+              d.getOrderId(),     // orderId
+              new BigDecimal(d.getFee()),
+              new Currency(d.getFeeCurrency()),
+              d.getClientOrderId()
+      );
+
+      userTradeList.add(ut);
+    }
 
     return new UserTrades(userTradeList, TradeSortType.SortByTimestamp);
   }
@@ -455,24 +462,30 @@ public class OkexAdapters {
   }
 
   public static Trades adaptTrades(
-      List<OkexTrade> okexTrades, Instrument instrument, ExchangeMetaData exchangeMetaData) {
-    List<Trade> trades = new ArrayList<>();
+          List<OkexTrade> okexTrades, Instrument instrument, ExchangeMetaData exchangeMetaData) {
 
-    okexTrades.forEach(
-        okexTrade ->
-            trades.add(
-                Trade.builder()
-                    .id(okexTrade.getTradeId())
-                    .instrument(instrument)
-                    .originalAmount(
-                        convertContractSizeToVolume(
-                            okexTrade.getSz(),
-                            instrument,
-                            exchangeMetaData.getInstruments().get(instrument).getContractValue()))
-                    .price(okexTrade.getPx())
-                    .timestamp(okexTrade.getTs())
-                    .type(adaptOkexOrderSideToOrderType(okexTrade.getSide()))
-                    .build()));
+    List<Trade> trades = new ArrayList<>(okexTrades.size());
+
+    BigDecimal contractValue =
+            exchangeMetaData.getInstruments().get(instrument).getContractValue();
+
+    for (OkexTrade okexTrade : okexTrades) {
+      BigDecimal amount = convertContractSizeToVolume(
+              okexTrade.getSz(), instrument, contractValue);
+
+      Date ts = okexTrade.getTs();
+
+      Trade trade = new Trade.Builder()
+              .id(okexTrade.getTradeId())
+              .instrument(instrument)
+              .originalAmount(amount)
+              .price(okexTrade.getPx())
+              .timestamp(ts)
+              .type(adaptOkexOrderSideToOrderType(okexTrade.getSide()))
+              .build();
+
+      trades.add(trade);
+    }
 
     return new Trades(trades);
   }
@@ -492,81 +505,68 @@ public class OkexAdapters {
   }
 
   public static ExchangeMetaData adaptToExchangeMetaData(
-      List<OkexInstrument> instruments, List<OkexCurrency> currs) {
+          List<OkexInstrument> instruments, List<OkexCurrency> currs) {
 
     Map<Instrument, InstrumentMetaData> instrumentMetaData = new HashMap<>();
     Map<Currency, CurrencyMetaData> currencies = new HashMap<>();
 
     for (OkexInstrument instrument : instruments) {
-      if (!"live".equals(instrument.getState())) {
+      if (!"live".equals(instrument.getState())) continue;
+
+      Instrument pair = adaptOkexInstrumentId(instrument.getInstrumentId());
+      if (pair instanceof FuturesContract
+              && ((FuturesContract) pair).isPerpetual()
+              && !pair.getCounter().equals(Currency.USDT)) {
         continue;
       }
 
-      Instrument pair = adaptOkexInstrumentId(instrument.getInstrumentId());
-      /*
-       TODO The Okex swap contracts with USD or USDC as counter currency
-       have issue with the volume conversion (from contractSize to volumeInBaseCurrency and reverse)
-       In order to fix the issue we need to change the convertContractSizeToVolume and convertVolumeToContractSize
-       functions. Probably we need to add price on the function but it is not possible when we place a MarketOrder
-       Because of that i think is best to leave this implementation in the future. (Critical)
-      */
-      if (pair instanceof FuturesContract
-          && ((FuturesContract) pair).isPerpetual()
-          && !pair.getCounter().equals(Currency.USDT)) {
-        continue;
-      }
-      instrumentMetaData.put(
-          pair,
-          InstrumentMetaData.builder()
-              .minimumAmount(
-                  (instrument.getInstrumentType().equals(OkexInstType.SWAP.name()))
-                      ? convertContractSizeToVolume(
-                          new BigDecimal(instrument.getMinSize()),
-                          pair,
-                          new BigDecimal(instrument.getContractValue()))
-                      : new BigDecimal(instrument.getMinSize()))
-              .volumeScale(
-                  (instrument.getInstrumentType().equals(OkexInstType.SWAP.name()))
-                      ? convertContractSizeToVolume(
-                              new BigDecimal(instrument.getMinSize()),
-                              pair,
-                              new BigDecimal(instrument.getContractValue()))
-                          .scale()
-                      : Math.max(numberOfDecimals(new BigDecimal(instrument.getMinSize())), 0))
-              .amountStepSize(
-                  BigDecimal.ONE.movePointLeft(
-                      (instrument.getInstrumentType().equals(OkexInstType.SWAP.name()))
-                          ? convertContractSizeToVolume(
-                                  new BigDecimal(instrument.getLotSize()),
-                                  pair,
-                                  new BigDecimal(instrument.getContractValue()))
-                              .scale()
-                          : Math.max(numberOfDecimals(new BigDecimal(instrument.getLotSize())), 0)))
-              .contractValue(
-                  (instrument.getInstrumentType().equals(OkexInstType.SWAP.name()))
-                      ? new BigDecimal(instrument.getContractValue())
-                      : null)
-              .priceScale(numberOfDecimals(new BigDecimal(instrument.getTickSize())))
-              .priceStepSize(
-                  BigDecimal.ONE.movePointLeft(
-                      numberOfDecimals(new BigDecimal(instrument.getTickSize()))))
-              .tradingFeeCurrency(Objects.requireNonNull(pair).getCounter())
+      final boolean isSwap = instrument.getInstrumentType().equals(OkexInstType.SWAP.name());
+
+      BigDecimal minSize  = new BigDecimal(instrument.getMinSize());
+      BigDecimal lotSize  = new BigDecimal(instrument.getLotSize());
+      BigDecimal tickSize = new BigDecimal(instrument.getTickSize());
+      BigDecimal contractValue = isSwap ? new BigDecimal(instrument.getContractValue()) : null;
+
+      BigDecimal minimumAmount = isSwap
+              ? convertContractSizeToVolume(minSize, pair, contractValue)
+              : minSize;
+
+      int volumeScale = isSwap
+              ? convertContractSizeToVolume(minSize, pair, contractValue).scale()
+              : Math.max(numberOfDecimals(minSize), 0);
+
+      BigDecimal amountStepSize = BigDecimal.ONE.movePointLeft(
+              isSwap
+                      ? convertContractSizeToVolume(lotSize, pair, contractValue).scale()
+                      : Math.max(numberOfDecimals(lotSize), 0)
+      );
+
+      int priceScale = numberOfDecimals(tickSize);
+      BigDecimal priceStepSize = BigDecimal.ONE.movePointLeft(priceScale);
+
+      InstrumentMetaData meta = new InstrumentMetaData.Builder()
+              .minimumAmount(minimumAmount)
+              .volumeScale(volumeScale)
+              .amountStepSize(amountStepSize)
+              .contractValue(contractValue)
+              .priceScale(priceScale)
+              .priceStepSize(priceStepSize)
+              .tradingFeeCurrency(pair.getCounter())
               .marketOrderEnabled(true)
-              .build());
+              .build();
+
+      instrumentMetaData.put(pair, meta);
     }
 
     if (currs != null) {
-      currs.forEach(
-          currency ->
+      currs.forEach(c ->
               currencies.put(
-                  adaptCurrency(currency),
-                  new CurrencyMetaData(
-                      null,
-                      new BigDecimal(currency.getMaxFee()),
-                      new BigDecimal(currency.getMinWd()),
-                      currency.isCanWd() && currency.isCanDep()
-                          ? WalletHealth.ONLINE
-                          : WalletHealth.OFFLINE)));
+                      adaptCurrency(c),
+                      new CurrencyMetaData(
+                              null,
+                              new BigDecimal(c.getMaxFee()),
+                              new BigDecimal(c.getMinWd()),
+                              (c.isCanWd() && c.isCanDep()) ? WalletHealth.ONLINE : WalletHealth.OFFLINE)));
     }
 
     return new ExchangeMetaData(instrumentMetaData, currencies, null, null, true);
@@ -642,28 +642,35 @@ public class OkexAdapters {
   }
 
   public static OpenPositions adaptOpenPositions(
-      List<OkexPosition> positions, ExchangeMetaData exchangeMetaData) {
-    List<OpenPosition> openPositions = new ArrayList<>();
+          List<OkexPosition> positions, ExchangeMetaData exchangeMetaData) {
 
-    positions.forEach(
-        okexPosition ->
-            openPositions.add(
-                OpenPosition.builder()
-                    .instrument(adaptOkexInstrumentId(okexPosition.getInstrumentId()))
-                    .liquidationPrice(okexPosition.getLiquidationPrice())
-                    .price(okexPosition.getAverageOpenPrice())
-                    .type(adaptOpenPositionType(okexPosition))
-                    .size(
-                        okexPosition
-                            .getPosition()
-                            .abs()
-                            .multiply(
-                                exchangeMetaData
-                                    .getInstruments()
-                                    .get(adaptOkexInstrumentId(okexPosition.getInstrumentId()))
-                                    .getContractValue()))
-                    .unRealisedPnl(okexPosition.getUnrealizedPnL())
-                    .build()));
+    List<OpenPosition> openPositions = new ArrayList<>(positions.size());
+
+    for (OkexPosition okexPosition : positions) {
+      Instrument instrument = adaptOkexInstrumentId(okexPosition.getInstrumentId());
+
+      BigDecimal contractValue = null;
+      if (exchangeMetaData != null
+              && exchangeMetaData.getInstruments() != null
+              && exchangeMetaData.getInstruments().get(instrument) != null) {
+        contractValue = exchangeMetaData.getInstruments().get(instrument).getContractValue();
+      }
+
+      BigDecimal absPos = okexPosition.getPosition().abs();
+      BigDecimal size = (contractValue != null) ? absPos.multiply(contractValue) : absPos;
+
+      OpenPosition op = new OpenPosition.Builder()
+              .instrument(instrument)
+              .liquidationPrice(okexPosition.getLiquidationPrice())
+              .price(okexPosition.getAverageOpenPrice())
+              .type(adaptOpenPositionType(okexPosition))
+              .size(size)
+              .unRealisedPnl(okexPosition.getUnrealizedPnL())
+              .build();
+
+      openPositions.add(op);
+    }
+
     return new OpenPositions(openPositions);
   }
 

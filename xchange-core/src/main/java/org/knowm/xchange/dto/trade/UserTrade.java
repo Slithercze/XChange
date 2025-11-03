@@ -1,18 +1,18 @@
 package org.knowm.xchange.dto.trade;
 
-import java.math.BigDecimal;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.knowm.xchange.currency.Currency;
+import org.knowm.xchange.dto.Order;
 import org.knowm.xchange.dto.marketdata.Trade;
+import org.knowm.xchange.instrument.Instrument;
+
+import java.math.BigDecimal;
+import java.util.Date;
 
 /** Data object representing a user trade */
 @Data
 @SuperBuilder
-@AllArgsConstructor
-@NoArgsConstructor
 public class UserTrade extends Trade {
 
   private static final long serialVersionUID = -3021617981214969292L;
@@ -28,4 +28,26 @@ public class UserTrade extends Trade {
 
   /** The order reference id which has been added by the user on the order creation */
   private String orderUserReference;
+
+  // In UserTrade.java
+  public UserTrade(
+          Order.OrderType type,
+          BigDecimal originalAmount,
+          Instrument instrument,
+          BigDecimal price,
+          Date timestamp,
+          String id,
+          String makerOrderId,
+          String takerOrderId,
+          String orderId,
+          BigDecimal feeAmount,
+          Currency feeCurrency,
+          String orderUserReference) {
+
+    super(type, originalAmount, instrument, price, timestamp, id, makerOrderId, takerOrderId);
+    this.orderId = orderId;
+    this.feeAmount = feeAmount;
+    this.feeCurrency = feeCurrency;
+    this.orderUserReference = orderUserReference;
+  }
 }

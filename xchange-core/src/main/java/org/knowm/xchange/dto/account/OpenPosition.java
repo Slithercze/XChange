@@ -2,54 +2,163 @@ package org.knowm.xchange.dto.account;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.Instant;
-import lombok.AllArgsConstructor;
+import java.util.Objects;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.knowm.xchange.instrument.Instrument;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 @SuperBuilder
-@NoArgsConstructor
-@AllArgsConstructor
 public class OpenPosition implements Serializable {
-
-  private String id;
-
   /** The instrument */
-  private Instrument instrument;
-
+  private final Instrument instrument;
   /** Is this a long or a short position */
-  private Type type;
-
-  private MarginMode marginMode;
-
+  private final Type type;
   /** The size of the position */
-  private BigDecimal size;
-
+  private final BigDecimal size;
   /** The average entry price for the position */
-  private BigDecimal price;
-
-  /** The estimated liquidation price */
-  private BigDecimal liquidationPrice;
+  @JsonIgnore private final BigDecimal price;
+  /** The estimatedLiquidationPrice */
+  @JsonIgnore private final BigDecimal liquidationPrice;
 
   /** The unrealised pnl of the position */
-  private BigDecimal unRealisedPnl;
+  @JsonIgnore private final BigDecimal unRealisedPnl;
 
-  /** Timestamp of creation */
-  private Instant createdAt;
+  public OpenPosition(
+          @JsonProperty("instrument") Instrument instrument,
+          @JsonProperty("type") Type type,
+          @JsonProperty("size") BigDecimal size,
+          @JsonProperty("price") BigDecimal price,
+          @JsonProperty("liquidationPrice") BigDecimal liquidationPrice,
+          @JsonProperty("unRealisedPnl") BigDecimal unRealisedPnl) {
+    this.instrument = instrument;
+    this.type = type;
+    this.size = size;
+    this.price = price;
+    this.liquidationPrice = liquidationPrice;
+    this.unRealisedPnl = unRealisedPnl;
+  }
 
-  /** Timestamp of update */
-  private Instant updatedAt;
+  public Instrument getInstrument() {
+    return instrument;
+  }
+
+  public Type getType() {
+    return type;
+  }
+
+  public BigDecimal getSize() {
+    return size;
+  }
+
+  public BigDecimal getPrice() {
+    return price;
+  }
+
+  public BigDecimal getLiquidationPrice() {
+    return liquidationPrice;
+  }
+
+  public BigDecimal getUnRealisedPnl() {
+    return unRealisedPnl;
+  }
+
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    final OpenPosition that = (OpenPosition) o;
+    return Objects.equals(instrument, that.instrument)
+            && type == that.type
+            && Objects.equals(size, that.size)
+            && Objects.equals(price, that.price)
+            && Objects.equals(liquidationPrice, that.liquidationPrice)
+            && Objects.equals(unRealisedPnl, that.unRealisedPnl);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(instrument, type, size, price, liquidationPrice, unRealisedPnl);
+  }
+
+  @Override
+  public String toString() {
+    return "OpenPosition{"
+            + "instrument="
+            + instrument
+            + ", type="
+            + type
+            + ", size="
+            + size
+            + ", price="
+            + price
+            + ", liquidationPrice="
+            + liquidationPrice
+            + ", unRealisedPnl="
+            + unRealisedPnl
+            + '}';
+  }
 
   public enum Type {
     LONG,
     SHORT
   }
 
-  public enum MarginMode {
-    CROSS,
-    ISOLATED
+  public static class Builder {
+    private Instrument instrument;
+    private Type type;
+    private BigDecimal size;
+    private BigDecimal price;
+    private BigDecimal liquidationPrice;
+    private BigDecimal unRealisedPnl;
+
+    public static Builder from(OpenPosition openPosition) {
+      return new Builder()
+              .instrument(openPosition.getInstrument())
+              .type(openPosition.getType())
+              .size(openPosition.getSize())
+              .liquidationPrice(openPosition.getLiquidationPrice())
+              .unRealisedPnl(openPosition.getUnRealisedPnl())
+              .price(openPosition.getPrice());
+    }
+
+    public Builder instrument(final Instrument instrument) {
+      this.instrument = instrument;
+      return this;
+    }
+
+    public Builder type(final Type type) {
+      this.type = type;
+      return this;
+    }
+
+    public Builder size(final BigDecimal size) {
+      this.size = size;
+      return this;
+    }
+
+    public Builder price(final BigDecimal price) {
+      this.price = price;
+      return this;
+    }
+
+    public Builder liquidationPrice(final BigDecimal liquidationPrice) {
+      this.liquidationPrice = liquidationPrice;
+      return this;
+    }
+
+    public Builder unRealisedPnl(final BigDecimal unRealisedPnl) {
+      this.unRealisedPnl = unRealisedPnl;
+      return this;
+    }
+
+    public OpenPosition build() {
+      return new OpenPosition(instrument, type, size, price, liquidationPrice, unRealisedPnl);
+    }
   }
 }

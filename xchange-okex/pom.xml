@@ -25,7 +25,7 @@
         <dependency>
             <groupId>org.knowm.xchange</groupId>
             <artifactId>xchange-core</artifactId>
-            <version>${project.version}</version>
+            <version>5.2.4-SNAPSHOT</version>
         </dependency>
 
         <!-- Add Lombok -->
