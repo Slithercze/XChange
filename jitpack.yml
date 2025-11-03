@@ -1,2 +1,5 @@
 jdk:
   - openjdk11
+  -
+install:
+  - mvn -B -DskipTests -pl xchange-core,xchange-okex -am install
