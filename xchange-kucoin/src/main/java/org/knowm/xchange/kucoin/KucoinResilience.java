@@ -1,9 +1,9 @@
 package org.knowm.xchange.kucoin;
 
-import static jakarta.ws.rs.core.Response.Status.TOO_MANY_REQUESTS;
-
 import io.github.resilience4j.ratelimiter.RateLimiterConfig;
 import java.time.Duration;
+
+import jakarta.ws.rs.core.Response;
 import org.knowm.xchange.client.ResilienceRegistries;
 import org.knowm.xchange.client.ResilienceUtils;
 
@@ -24,7 +24,7 @@ public class KucoinResilience {
                 .limitRefreshPeriod(Duration.ofSeconds(10))
                 .limitForPeriod(30)
                 .drainPermissionsOnResult(
-                    e -> ResilienceUtils.matchesHttpCode(e, TOO_MANY_REQUESTS))
+                    e -> ResilienceUtils.matchesHttpCode(e, 429))
                 .build());
 
     registries
@@ -35,7 +35,7 @@ public class KucoinResilience {
                 .limitRefreshPeriod(Duration.ofSeconds(3))
                 .limitForPeriod(30)
                 .drainPermissionsOnResult(
-                    e -> ResilienceUtils.matchesHttpCode(e, TOO_MANY_REQUESTS))
+                    e -> ResilienceUtils.matchesHttpCode(e, 429))
                 .build());
 
     return registries;

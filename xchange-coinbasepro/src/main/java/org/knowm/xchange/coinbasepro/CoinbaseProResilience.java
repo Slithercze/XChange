@@ -1,11 +1,10 @@
 package org.knowm.xchange.coinbasepro;
 
-import static jakarta.ws.rs.core.Response.Status.TOO_MANY_REQUESTS;
-
 import io.github.resilience4j.ratelimiter.RateLimiterConfig;
-import java.time.Duration;
 import org.knowm.xchange.client.ResilienceRegistries;
 import org.knowm.xchange.client.ResilienceUtils;
+
+import java.time.Duration;
 
 public class CoinbaseProResilience {
 
@@ -24,7 +23,7 @@ public class CoinbaseProResilience {
                 .limitRefreshPeriod(Duration.ofSeconds(1))
                 .limitForPeriod(10)
                 .drainPermissionsOnResult(
-                    e -> ResilienceUtils.matchesHttpCode(e, TOO_MANY_REQUESTS))
+                    e -> ResilienceUtils.matchesHttpCode(e, 429))
                 .build());
 
     registries
@@ -35,7 +34,7 @@ public class CoinbaseProResilience {
                 .limitRefreshPeriod(Duration.ofSeconds(1))
                 .limitForPeriod(15)
                 .drainPermissionsOnResult(
-                    e -> ResilienceUtils.matchesHttpCode(e, TOO_MANY_REQUESTS))
+                    e -> ResilienceUtils.matchesHttpCode(e, 429))
                 .build());
 
     return registries;

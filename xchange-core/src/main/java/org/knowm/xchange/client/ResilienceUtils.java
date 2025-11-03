@@ -30,6 +30,13 @@ public final class ResilienceUtils {
         && ((HttpStatusExceptionSupport) throwable).getHttpStatusCode() == status.getStatusCode();
   }
 
+  public static boolean matchesHttpCode(final Either<? extends Throwable, ?> e, final int statusCode) {
+    if (e.isRight()) return false;
+    final Throwable t = e.getLeft();
+    return t instanceof HttpStatusExceptionSupport
+            && ((HttpStatusExceptionSupport) t).getHttpStatusCode() == statusCode;
+  }
+
   public interface CallableApi<T> extends Callable<T> {
 
     T call() throws IOException;
