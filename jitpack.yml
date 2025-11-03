@@ -3,4 +3,4 @@ jdk:
 before_install:
   - mvn -N io.takari:maven:wrapper -Dmaven=3.9.6
 install:
-  - mvn -B -DskipTests -pl xchange-core,xchange-okex -am install
+  - ./mvnw -B -DskipTests -pl xchange-core,xchange-okex -am install
