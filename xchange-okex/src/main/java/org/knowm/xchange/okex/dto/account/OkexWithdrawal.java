@@ -17,7 +17,7 @@ public class OkexWithdrawal {
     @JsonProperty("feeCcy")   private String feeCcy;
     @JsonProperty("txId")  private String txId;
     @JsonProperty("chain") private String chain;
-    @JsonProperty("toAddr")private String toAddr;
+    @JsonProperty("to")    private String toAddr;
     @JsonProperty("state") private String state;  // e.g., success, pending, canceled
     @JsonProperty("ts")    private String ts;     // ms
 }
