@@ -1,6 +1,6 @@
 package org.knowm.xchange.dase.service;
 
-import jakarta.ws.rs.HeaderParam;
+import javax.ws.rs.HeaderParam;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import javax.crypto.Mac;
