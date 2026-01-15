@@ -131,9 +131,13 @@ public final class DaseAdapters {
     } else {
       status = Order.OrderStatus.UNKNOWN;
     }
+    if (status != Order.OrderStatus.FILLED) {
+      return null;
+    }
+
     Date ts = o.getCreatedAt() == null ? null : new Date(o.getCreatedAt());
 
-    if ("limit".equalsIgnoreCase(o.getType())) {
+    if (true) {
       BigDecimal price = parseDecimal(o.getPrice());
       return new LimitOrder(
           side,

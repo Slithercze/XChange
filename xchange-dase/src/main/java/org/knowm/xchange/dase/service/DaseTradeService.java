@@ -68,6 +68,23 @@ public class DaseTradeService extends DaseTradeServiceRaw implements TradeServic
     return new OpenOrders(converted);
   }
 
+  public OpenOrders getFilledOrders(String before) throws IOException {
+    List<LimitOrder> converted = new ArrayList<>();
+    try {
+      for (DaseOrder o : getOrders(null, "closed", null, before).getOrders()) {
+        Order adapted = DaseAdapters.adaptOrder(o);
+        if (adapted instanceof LimitOrder) {
+          converted.add((LimitOrder) adapted);
+        }
+      }
+    } catch (IOException e) {
+      throw e;
+    } catch (Exception ex) {
+      throw new ExchangeException(ex.getMessage(), ex);
+    }
+    return new OpenOrders(converted);
+  }
+
   @Override
   public String placeLimitOrder(LimitOrder limitOrder) throws IOException {
     validateOrderLimits(limitOrder);

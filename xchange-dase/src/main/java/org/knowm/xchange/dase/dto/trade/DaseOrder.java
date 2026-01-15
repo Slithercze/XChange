@@ -2,8 +2,10 @@ package org.knowm.xchange.dase.dto.trade;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.ToString;
 
 /** Immutable DTO representing an order from DASE REST API. */
+@ToString
 public class DaseOrder {
 
   private final String id;
