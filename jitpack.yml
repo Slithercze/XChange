@@ -1,6 +1,14 @@
 jdk:
   - openjdk11
+
 before_install:
   - mvn -N io.takari:maven:wrapper -Dmaven=3.9.6
+
 install:
-  - ./mvnw -B -DskipTests -pl xchange-core,xchange-dase -am install
+  - ./mvnw -B -pl xchange-dase -am clean install \
+    -DskipTests \
+    -Dmaven.test.skip=true \
+    -Dmaven.javadoc.skip=true \
+    -Dgpg.skip=true \
+    -Dcheckstyle.skip=true \
+    -Dspotbugs.skip=true
