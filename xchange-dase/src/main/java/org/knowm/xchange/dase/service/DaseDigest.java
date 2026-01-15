@@ -1,11 +1,11 @@
 package org.knowm.xchange.dase.service;
 
-import javax.ws.rs.HeaderParam;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import javax.crypto.Mac;
 import org.knowm.xchange.service.BaseParamsDigest;
 import si.mazi.rescu.RestInvocation;
+
+import javax.crypto.Mac;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 /**
  * HMAC-SHA256 signer for DASE.
@@ -25,7 +25,7 @@ public class DaseDigest extends BaseParamsDigest {
   @Override
   public String digestParams(RestInvocation restInvocation) {
     final String timestamp =
-        String.valueOf(restInvocation.getParamValue(HeaderParam.class, "ex-api-timestamp"));
+            String.valueOf(restInvocation.getHttpHeadersFromParams().getOrDefault("ex-api-timestamp", null));
 
     final String method = restInvocation.getHttpMethod().toUpperCase();
 
