@@ -1,13 +1,13 @@
 package org.knowm.xchange.dto.account;
 
+import org.knowm.xchange.currency.Currency;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import lombok.Builder;
-import lombok.Data;
-import org.knowm.xchange.currency.Currency;
+import java.util.Objects;
 
 /**
  * DTO representing funding information
@@ -15,61 +15,265 @@ import org.knowm.xchange.currency.Currency;
  * <p>Funding information contains the detail of deposit/withdrawal transaction for a specific
  * currency
  */
-@Data
-@Builder
-public class FundingRecord implements Serializable {
+public final class FundingRecord implements Serializable {
 
   private static final long serialVersionUID = 3788398035845873448L;
 
   /** Crypto currency address for deposit/withdrawal */
-  private String address;
+  private final String address;
 
   /** Crypto currency destination tag for deposit/withdrawal */
-  private String addressTag;
+  private final String addressTag;
 
   /** Date/Time of transaction */
-  private Date date;
+  private final Date date;
 
   /** The transaction currency */
-  private Currency currency;
+  private final Currency currency;
 
   /** Amount deposited/withdrawn in given transaction currency (always positive) */
-  private BigDecimal amount;
+  private final BigDecimal amount;
 
   /** Internal transaction identifier, specific to the Exchange. */
-  private String internalId;
+  private final String internalId;
 
   /**
    * External Transaction id that identifies the transaction within the public ledger, eg.
    * blockchain transaction hash.
    */
-  private String blockchainTransactionHash;
+  private final String blockchainTransactionHash;
 
   /** Transaction Type */
-  private Type type;
+  private final Type type;
 
   /**
    * Status of the transaction whenever available (e.g. Open, Completed or any descriptive status of
    * transaction)
    */
-  private Status status;
+  private final Status status;
 
   /** Balance of the associated account after the transaction is performed */
-  private BigDecimal balance;
+  private final BigDecimal balance;
 
   /** Transaction Fee Amount in given transaction currency (always positive) */
-  private BigDecimal fee;
+  private final BigDecimal fee;
 
   /** Description of the transaction */
-  private String description;
+  private final String description;
 
+  private FundingRecord(Builder b) {
+    this.address = b.address;
+    this.addressTag = b.addressTag;
+    // defensive copies (Date is mutable)
+    this.date = b.date == null ? null : new Date(b.date.getTime());
+    this.currency = b.currency;
+    this.amount = b.amount;
+    this.internalId = b.internalId;
+    this.blockchainTransactionHash = b.blockchainTransactionHash;
+    this.type = b.type;
+    this.status = b.status;
+    this.balance = b.balance;
+    this.fee = b.fee;
+    this.description = b.description;
+  }
+
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  public String getAddress() {
+    return address;
+  }
+
+  public String getAddressTag() {
+    return addressTag;
+  }
+
+  public Date getDate() {
+    return date == null ? null : new Date(date.getTime());
+  }
+
+  public Currency getCurrency() {
+    return currency;
+  }
+
+  /** Always returns a positive amount (or null). */
   public BigDecimal getAmount() {
     return amount == null ? null : amount.abs();
   }
 
-  @Deprecated // for backward compatibility.  Will be removed
+  /** Raw value as provided (may be negative depending on upstream). */
+  public BigDecimal getAmountRaw() {
+    return amount;
+  }
+
+  public String getInternalId() {
+    return internalId;
+  }
+
+  public String getBlockchainTransactionHash() {
+    return blockchainTransactionHash;
+  }
+
+  public Type getType() {
+    return type;
+  }
+
+  public Status getStatus() {
+    return status;
+  }
+
+  public BigDecimal getBalance() {
+    return balance;
+  }
+
+  public BigDecimal getFee() {
+    return fee == null ? null : fee.abs();
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  @Deprecated // for backward compatibility. Will be removed
   public String getExternalId() {
     return blockchainTransactionHash;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof FundingRecord)) return false;
+    FundingRecord that = (FundingRecord) o;
+    return Objects.equals(address, that.address)
+            && Objects.equals(addressTag, that.addressTag)
+            && Objects.equals(date, that.date)
+            && Objects.equals(currency, that.currency)
+            && Objects.equals(amount, that.amount)
+            && Objects.equals(internalId, that.internalId)
+            && Objects.equals(blockchainTransactionHash, that.blockchainTransactionHash)
+            && type == that.type
+            && status == that.status
+            && Objects.equals(balance, that.balance)
+            && Objects.equals(fee, that.fee)
+            && Objects.equals(description, that.description);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+            address,
+            addressTag,
+            date,
+            currency,
+            amount,
+            internalId,
+            blockchainTransactionHash,
+            type,
+            status,
+            balance,
+            fee,
+            description
+    );
+  }
+
+  @Override
+  public String toString() {
+    return "FundingRecord{"
+            + "address='" + address + '\''
+            + ", addressTag='" + addressTag + '\''
+            + ", date=" + date
+            + ", currency=" + currency
+            + ", amount=" + amount
+            + ", internalId='" + internalId + '\''
+            + ", blockchainTransactionHash='" + blockchainTransactionHash + '\''
+            + ", type=" + type
+            + ", status=" + status
+            + ", balance=" + balance
+            + ", fee=" + fee
+            + ", description='" + description + '\''
+            + '}';
+  }
+
+  public static final class Builder {
+    private String address;
+    private String addressTag;
+    private Date date;
+    private Currency currency;
+    private BigDecimal amount;
+    private String internalId;
+    private String blockchainTransactionHash;
+    private Type type;
+    private Status status;
+    private BigDecimal balance;
+    private BigDecimal fee;
+    private String description;
+
+    private Builder() {}
+
+    public Builder address(String address) {
+      this.address = address;
+      return this;
+    }
+
+    public Builder addressTag(String addressTag) {
+      this.addressTag = addressTag;
+      return this;
+    }
+
+    public Builder date(Date date) {
+      this.date = date;
+      return this;
+    }
+
+    public Builder currency(Currency currency) {
+      this.currency = currency;
+      return this;
+    }
+
+    public Builder amount(BigDecimal amount) {
+      this.amount = amount;
+      return this;
+    }
+
+    public Builder internalId(String internalId) {
+      this.internalId = internalId;
+      return this;
+    }
+
+    public Builder blockchainTransactionHash(String blockchainTransactionHash) {
+      this.blockchainTransactionHash = blockchainTransactionHash;
+      return this;
+    }
+
+    public Builder type(Type type) {
+      this.type = type;
+      return this;
+    }
+
+    public Builder status(Status status) {
+      this.status = status;
+      return this;
+    }
+
+    public Builder balance(BigDecimal balance) {
+      this.balance = balance;
+      return this;
+    }
+
+    public Builder fee(BigDecimal fee) {
+      this.fee = fee;
+      return this;
+    }
+
+    public Builder description(String description) {
+      this.description = description;
+      return this;
+    }
+
+    public FundingRecord build() {
+      return new FundingRecord(this);
+    }
   }
 
   /** Enum representing funding transaction type */
@@ -122,22 +326,23 @@ public class FundingRecord implements Serializable {
       for (Type type : values()) fromString.put(type.toString(), type);
     }
 
-    private boolean inflow;
+    private final boolean inflow;
 
     Type(final boolean inflow) {
       this.inflow = inflow;
     }
 
     public static Type fromString(String ledgerTypeString) {
+      if (ledgerTypeString == null) return null;
       return fromString.get(ledgerTypeString.toUpperCase());
     }
 
     public boolean isInflowing() {
-      return this.inflow;
+      return inflow;
     }
 
     public boolean isOutflowing() {
-      return !this.inflow;
+      return !inflow;
     }
   }
 
@@ -188,16 +393,14 @@ public class FundingRecord implements Serializable {
       }
     }
 
-    private String[] statusArray;
+    private final String[] statusArray;
 
     Status(String... statusArray) {
       this.statusArray = statusArray;
     }
 
     public static Status resolveStatus(String str) {
-      if (str == null) {
-        return null;
-      }
+      if (str == null) return null;
       return fromString.get(str.toUpperCase());
     }
   }
