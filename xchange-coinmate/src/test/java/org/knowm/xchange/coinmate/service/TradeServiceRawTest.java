@@ -26,7 +26,7 @@ public class TradeServiceRawTest {
     assertNotNull(service);
     CoinmateTransactionHistory transactionHistory =
         service.getCoinmateTransactionHistory(
-            0, 1000, "DESC", 1612134000000L, 1614783942000L, null);
+            0, 1000, "DESC", 1612134000000L, 1614783942000L, null, true);
     assertNotNull(transactionHistory);
     assertNotNull(transactionHistory.getData());
 //    System.out.println("Got " + transactionHistory.getData().size() + " transactions.");
@@ -45,7 +45,7 @@ public class TradeServiceRawTest {
     CoinmateTradeServiceRaw service = (CoinmateTradeServiceRaw) exchange.getTradeService();
     assertNotNull(service);
     CoinmateTransactionHistory transactionHistory =
-        service.getCoinmateTransactionHistory(0, 1000, "DESC", null, null, null);
+        service.getCoinmateTransactionHistory(0, 1000, "DESC", null, null, null, true);
     assertNotNull(transactionHistory);
     assertNotNull(transactionHistory.getData());
 //    System.out.println("Got " + transactionHistory.getData().size() + " transactions.");

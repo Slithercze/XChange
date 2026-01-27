@@ -303,6 +303,7 @@ public class CoinmateAccountServiceRaw extends CoinmateBaseService {
             sort,
             timestampFrom,
             timestampTo,
+            true,
             orderId);
 
     throwExceptionIfError(tradeHistory);

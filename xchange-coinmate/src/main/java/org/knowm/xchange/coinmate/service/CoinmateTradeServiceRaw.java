@@ -52,7 +52,7 @@ public class CoinmateTradeServiceRaw extends CoinmateBaseService {
   }
 
   public CoinmateTransactionHistory getCoinmateTransactionHistory(
-      int offset, Integer limit, String sort, Long timestampFrom, Long timestampTo, String orderId)
+      int offset, Integer limit, String sort, Long timestampFrom, Long timestampTo, String orderId, boolean archived)
       throws IOException {
     CoinmateTransactionHistory transactionHistory =
         coinmateAuthenticated.getTransactionHistory(
@@ -66,6 +66,7 @@ public class CoinmateTradeServiceRaw extends CoinmateBaseService {
             sort,
             timestampFrom,
             timestampTo,
+            archived,
             orderId);
 
     throwExceptionIfError(transactionHistory);
