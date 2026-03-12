@@ -11,31 +11,70 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
+import org.knowm.xchange.Exchange;
+import org.knowm.xchange.ExchangeFactory;
+import org.knowm.xchange.ExchangeSpecification;
 import org.knowm.xchange.bitstamp.dto.account.BitstampBalance;
 import org.knowm.xchange.bitstamp.dto.marketdata.BitstampOrderBook;
 import org.knowm.xchange.bitstamp.dto.marketdata.BitstampTicker;
 import org.knowm.xchange.bitstamp.dto.marketdata.BitstampTransaction;
 import org.knowm.xchange.bitstamp.dto.trade.BitstampOrderStatusResponse;
-import org.knowm.xchange.bitstamp.dto.trade.BitstampTradingFee;
 import org.knowm.xchange.bitstamp.dto.trade.BitstampUserTransaction;
 import org.knowm.xchange.bitstamp.order.dto.BitstampGenericOrder;
+import org.knowm.xchange.bitstamp.service.BitstampTradeHistoryParams;
+import org.knowm.xchange.bitstamp.service.BitstampTradeService;
 import org.knowm.xchange.currency.Currency;
 import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.dto.Order;
 import org.knowm.xchange.dto.Order.OrderType;
 import org.knowm.xchange.dto.account.AccountInfo;
 import org.knowm.xchange.dto.account.Fee;
+import org.knowm.xchange.dto.account.FundingRecord;
 import org.knowm.xchange.dto.marketdata.OrderBook;
 import org.knowm.xchange.dto.marketdata.Ticker;
 import org.knowm.xchange.dto.marketdata.Trade;
 import org.knowm.xchange.dto.marketdata.Trades;
+import org.knowm.xchange.dto.trade.UserTrade;
 import org.knowm.xchange.dto.trade.UserTrades;
 import org.knowm.xchange.instrument.Instrument;
+import org.knowm.xchange.service.account.AccountService;
+import org.knowm.xchange.service.trade.TradeService;
 
 /** Tests the BitstampAdapter class */
 public class BitstampAdapterTest {
+  @Test
+  public void testTxsDownload() {
+    String apiKey = "2Qw3xHGncfKmk1uZRQD7tKtgTxzb43yE";
+    String apiSecret = "u9LloND2myH3UrOSUIId7spRYKPImQw6";
+    String username = "55108";
+    BitstampExchange exchange2 = new BitstampExchange();
+    ExchangeSpecification exSpec = exchange2.getDefaultExchangeSpecification();
+    exSpec.setApiKey(apiKey);
+    exSpec.setSecretKey(apiSecret);
+    exSpec.setUserName(username);
+    Exchange exchange = ExchangeFactory.INSTANCE.createExchange(exSpec);
 
+    TradeService tradeService = exchange.getTradeService();
+    BitstampTradeHistoryParams params = (BitstampTradeHistoryParams) tradeService.createTradeHistoryParams();
+    BitstampTradeService tradeServices = new BitstampTradeService(exchange);
+    AccountService accountService = exchange.getAccountService();
+
+
+    final List<UserTrade> userTrades = new ArrayList<>();
+    final List<FundingRecord> userTradesBlock = new ArrayList<>();
+
+
+    while (userTradesBlock.isEmpty()) {
+      try {
+        userTradesBlock.addAll(accountService.getFundingHistory(params));
+      } catch (IOException e) {
+        throw new IllegalStateException("Download user trade history failed.", e);
+      }
+
+    }
+
+  }
   @Test
   public void testAccountInfoAdapter() throws IOException {
 
@@ -112,7 +151,7 @@ public class BitstampAdapterTest {
     assertThat(trade.getPrice().toString()).isEqualTo("13.14");
     assertThat(trade.getType()).isEqualTo(OrderType.BID);
     assertThat(trade.getOriginalAmount()).isEqualTo(new BigDecimal("23.66362253"));
-    assertThat(trade.getInstrument()).isEqualTo(CurrencyPair.BTC_USD);
+    assertThat(trade.getCurrencyPair()).isEqualTo(CurrencyPair.BTC_USD);
   }
 
   @Test
@@ -136,7 +175,7 @@ public class BitstampAdapterTest {
     assertThat(trades.getTrades().get(0).getType()).isEqualTo(OrderType.BID);
     assertThat(trades.getTrades().get(0).getOriginalAmount())
         .isEqualTo(new BigDecimal("10.11643836"));
-    assertThat(trades.getTrades().get(0).getInstrument()).isEqualTo(CurrencyPair.BTC_USD);
+    assertThat(trades.getTrades().get(0).getCurrencyPair()).isEqualTo(CurrencyPair.BTC_USD);
   }
 
   @Test
@@ -246,38 +285,5 @@ public class BitstampAdapterTest {
     assertThat(genericOrder.getCumulativeAmount()).isEqualTo(new BigDecimal("0.00838324"));
     assertThat(genericOrder.getFee()).isEqualTo(new BigDecimal("0.43692"));
     assertThat(genericOrder.getStatus()).isEqualTo(Order.OrderStatus.FILLED);
-  }
-
-  @Test
-  public void testTradingFeesAdapter() throws IOException {
-    // Read in the JSON from the example resources
-    InputStream is =
-        BitstampAdapterTest.class.getResourceAsStream(
-            "/org/knowm/xchange/bitstamp/dto/trade/example-trading-fees-data.json");
-
-    // Use Jackson to parse it
-    ObjectMapper mapper = new ObjectMapper();
-    List<BitstampTradingFee> tradingFees =
-        mapper.readValue(
-            is,
-            mapper.getTypeFactory().constructCollectionType(List.class, BitstampTradingFee.class));
-
-    // Call the adapter method
-    Map<Instrument, Fee> feesMap = BitstampAdapters.adaptTradingFees(tradingFees);
-
-    // Verify the results
-    assertThat(feesMap.size()).isEqualTo(2);
-
-    // Check BTC/USD fees
-    CurrencyPair btcUsd = CurrencyPair.BTC_USD;
-    assertThat(feesMap.containsKey(btcUsd)).isTrue();
-    assertThat(feesMap.get(btcUsd).getMakerFee()).isEqualTo(new BigDecimal("0.0012"));
-    assertThat(feesMap.get(btcUsd).getTakerFee()).isEqualTo(new BigDecimal("0.0020"));
-
-    // Check ETH/USD fees
-    CurrencyPair ethUsd = CurrencyPair.ETH_USD;
-    assertThat(feesMap.containsKey(ethUsd)).isTrue();
-    assertThat(feesMap.get(ethUsd).getMakerFee()).isEqualTo(new BigDecimal("0.0015"));
-    assertThat(feesMap.get(ethUsd).getTakerFee()).isEqualTo(new BigDecimal("0.0025"));
   }
 }

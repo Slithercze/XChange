@@ -86,24 +86,9 @@ public class KucoinExchange extends BaseExchange implements Exchange {
 
   @Override
   public void remoteInit() throws IOException, ExchangeException {
-    List<SymbolResponse> symbols = getMarketDataService().getKucoinSymbolsV2();
-
-    Map<Instrument, InstrumentMetaData> instruments =
-        symbols.stream()
-            .collect(
-                Collectors.toMap(
-                    SymbolResponse::getCurrencyPair, KucoinAdapters::toInstrumentMetaData));
-
-    List<KucoinCurrencyResponseV3> currencies = getMarketDataService().getAllKucoinCurrencies();
-
-    Map<Currency, CurrencyMetaData> currencyMetaData =
-        currencies.stream()
-            .collect(
-                Collectors.toMap(
-                    KucoinCurrencyResponseV3::getCurrency, KucoinAdapters::toCurrencyMetaData));
-
-    exchangeMetaData.setInstruments(instruments);
-    exchangeMetaData.setCurrencies(currencyMetaData);
+    // Skip remote init to avoid incompatibility with older xchange-core versions
+    // that lack builder methods on InstrumentMetaData and CurrencyMetaData.
+    // The connector does not need exchange metadata for trade downloads.
   }
 
   @Override
