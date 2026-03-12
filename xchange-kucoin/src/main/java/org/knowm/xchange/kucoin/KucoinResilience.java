@@ -3,7 +3,7 @@ package org.knowm.xchange.kucoin;
 import io.github.resilience4j.ratelimiter.RateLimiterConfig;
 import java.time.Duration;
 
-import jakarta.ws.rs.core.Response;
+import javax.ws.rs.core.Response;
 import org.knowm.xchange.client.ResilienceRegistries;
 import org.knowm.xchange.client.ResilienceUtils;
 

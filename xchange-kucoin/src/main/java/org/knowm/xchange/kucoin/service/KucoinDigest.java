@@ -1,7 +1,7 @@
 package org.knowm.xchange.kucoin.service;
 
 import com.google.common.base.Strings;
-import jakarta.ws.rs.HeaderParam;
+import javax.ws.rs.HeaderParam;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import javax.crypto.Mac;
