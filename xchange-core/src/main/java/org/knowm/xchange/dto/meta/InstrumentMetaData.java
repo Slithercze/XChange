@@ -86,6 +86,10 @@ public class InstrumentMetaData implements Serializable {
 
 
 
+  public static Builder builder() {
+    return new Builder();
+  }
+
   public static class Builder{
     private BigDecimal tradingFee;
     private FeeTier[] feeTiers;
