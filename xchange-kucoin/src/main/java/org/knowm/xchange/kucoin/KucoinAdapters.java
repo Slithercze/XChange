@@ -114,7 +114,7 @@ public class KucoinAdapters {
   }
 
   public static InstrumentMetaData toInstrumentMetaData(SymbolResponse symbolResponse) {
-    return InstrumentMetaData.builder()
+    return new InstrumentMetaData.Builder()
         .minimumAmount(symbolResponse.getBaseMinSize())
         .maximumAmount(symbolResponse.getBaseMaxSize())
         .counterMinimumAmount(symbolResponse.getQuoteMinSize())
