@@ -60,8 +60,11 @@ public class KucoinBaseService extends BaseResilientExchangeService<KucoinExchan
     String rawPassphrase =
         (String)
             exchange.getExchangeSpecification().getExchangeSpecificParametersItem("passphrase");
+    Object keyVersionParam =
+        exchange.getExchangeSpecification().getExchangeSpecificParametersItem("apiKeyVersion");
+    String keyVersion = keyVersionParam != null ? keyVersionParam.toString() : null;
     // Encrypt the passphrase for API v2 key support
-    if (rawPassphrase != null && this.digest != null) {
+    if ("2".equals(keyVersion) && rawPassphrase != null && this.digest != null) {
       this.passphrase = this.digest.encryptPassphrase(rawPassphrase);
       this.apiKeyVersion = "2";
     } else {
