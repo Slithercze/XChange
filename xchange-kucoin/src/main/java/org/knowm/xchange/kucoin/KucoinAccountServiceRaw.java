@@ -32,7 +32,7 @@ public class KucoinAccountServiceRaw extends KucoinBaseService {
     return decorateApiCall(
             () ->
                 accountApi.getAccountList(
-                    apiKey, digest, nonceFactory, passphrase, currency, accountType))
+                    apiKey, digest, nonceFactory, passphrase, apiKeyVersion, currency, accountType))
         .withRetry(retry("accountList"))
         .withRateLimiter(rateLimiter(PRIVATE_REST_ENDPOINT_RATE_LIMITER))
         .call()
@@ -50,6 +50,7 @@ public class KucoinAccountServiceRaw extends KucoinBaseService {
                             digest,
                             nonceFactory,
                             passphrase,
+                            apiKeyVersion,
                             CreateAccountRequest.builder().currency(currency).type(type).build()))
                 .withRateLimiter(rateLimiter(PRIVATE_REST_ENDPOINT_RATE_LIMITER))
                 .call());
@@ -57,7 +58,7 @@ public class KucoinAccountServiceRaw extends KucoinBaseService {
 
   public ApplyWithdrawResponse applyWithdraw(ApplyWithdrawApiRequest req) throws IOException {
     return decorateApiCall(
-            () -> withdrawalAPI.applyWithdraw(apiKey, digest, nonceFactory, passphrase, req))
+            () -> withdrawalAPI.applyWithdraw(apiKey, digest, nonceFactory, passphrase, apiKeyVersion, req))
         .withRateLimiter(rateLimiter(PRIVATE_REST_ENDPOINT_RATE_LIMITER))
         .call()
         .getData();
@@ -65,7 +66,7 @@ public class KucoinAccountServiceRaw extends KucoinBaseService {
 
   public InternalTransferResponse innerTransfer(InnerTransferRequest req) throws IOException {
     return decorateApiCall(
-            () -> accountApi.innerTransfer(apiKey, digest, nonceFactory, passphrase, req))
+            () -> accountApi.innerTransfer(apiKey, digest, nonceFactory, passphrase, apiKeyVersion, req))
         .withRateLimiter(rateLimiter(PRIVATE_REST_ENDPOINT_RATE_LIMITER))
         .call()
         .getData();
@@ -85,6 +86,7 @@ public class KucoinAccountServiceRaw extends KucoinBaseService {
                             digest,
                             nonceFactory,
                             passphrase,
+                            apiKeyVersion,
                             accountId,
                             startAt,
                             endAt,
@@ -113,6 +115,7 @@ public class KucoinAccountServiceRaw extends KucoinBaseService {
                             digest,
                             nonceFactory,
                             passphrase,
+                            apiKeyVersion,
                             currency,
                             direction,
                             bizType,
@@ -142,6 +145,7 @@ public class KucoinAccountServiceRaw extends KucoinBaseService {
                             digest,
                             nonceFactory,
                             passphrase,
+                            apiKeyVersion,
                             currency,
                             status,
                             startAt,
@@ -170,6 +174,7 @@ public class KucoinAccountServiceRaw extends KucoinBaseService {
                             digest,
                             nonceFactory,
                             passphrase,
+                            apiKeyVersion,
                             currency,
                             status,
                             startAt,
@@ -184,7 +189,7 @@ public class KucoinAccountServiceRaw extends KucoinBaseService {
       throws IOException {
     return decorateApiCall(
             () ->
-                depositAPI.createDepositAddress(apiKey, digest, nonceFactory, passphrase, request))
+                depositAPI.createDepositAddress(apiKey, digest, nonceFactory, passphrase, apiKeyVersion, request))
         .withRateLimiter(rateLimiter(PRIVATE_REST_ENDPOINT_RATE_LIMITER))
         .call()
         .getData();
@@ -199,7 +204,7 @@ public class KucoinAccountServiceRaw extends KucoinBaseService {
     return decorateApiCall(
             () ->
                 depositAPI.getDepositAddress(
-                    apiKey, digest, nonceFactory, passphrase, currencyAdapted, chain))
+                    apiKey, digest, nonceFactory, passphrase, apiKeyVersion, currencyAdapted, chain))
         .withRateLimiter(rateLimiter(PRIVATE_REST_ENDPOINT_RATE_LIMITER))
         .call()
         .getData();
@@ -208,7 +213,7 @@ public class KucoinAccountServiceRaw extends KucoinBaseService {
   public List<DepositAddressResponse> getDepositAddresses(String currency) throws IOException {
     return decorateApiCall(
             () ->
-                depositAPI.getDepositAddresses(apiKey, digest, nonceFactory, passphrase, currency))
+                depositAPI.getDepositAddresses(apiKey, digest, nonceFactory, passphrase, apiKeyVersion, currency))
         .withRateLimiter(rateLimiter(PRIVATE_REST_ENDPOINT_RATE_LIMITER))
         .call()
         .getData();

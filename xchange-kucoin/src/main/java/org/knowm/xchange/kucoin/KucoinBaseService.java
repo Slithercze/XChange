@@ -38,6 +38,7 @@ public class KucoinBaseService extends BaseResilientExchangeService<KucoinExchan
   protected KucoinDigest digest;
   protected String apiKey;
   protected String passphrase;
+  protected String apiKeyVersion;
   protected SynchronizedValueFactory<Long> nonceFactory;
 
   protected KucoinBaseService(KucoinExchange exchange, ResilienceRegistries resilienceRegistries) {
@@ -56,9 +57,17 @@ public class KucoinBaseService extends BaseResilientExchangeService<KucoinExchan
 
     this.digest = KucoinDigest.createInstance(exchange.getExchangeSpecification().getSecretKey());
     this.apiKey = exchange.getExchangeSpecification().getApiKey();
-    this.passphrase =
+    String rawPassphrase =
         (String)
             exchange.getExchangeSpecification().getExchangeSpecificParametersItem("passphrase");
+    // Encrypt the passphrase for API v2 key support
+    if (rawPassphrase != null && this.digest != null) {
+      this.passphrase = this.digest.encryptPassphrase(rawPassphrase);
+      this.apiKeyVersion = "2";
+    } else {
+      this.passphrase = rawPassphrase;
+      this.apiKeyVersion = null;
+    }
     this.nonceFactory = exchange.getNonceFactory();
 
     this.tradingFeeAPI = service(exchange, TradingFeeAPI.class);

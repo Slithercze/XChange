@@ -35,6 +35,7 @@ public interface WithdrawalAPI {
       @HeaderParam(APIConstants.API_HEADER_SIGN) ParamsDigest signature,
       @HeaderParam(APIConstants.API_HEADER_TIMESTAMP) SynchronizedValueFactory<Long> nonce,
       @HeaderParam(APIConstants.API_HEADER_PASSPHRASE) String apiPassphrase,
+      @HeaderParam(APIConstants.API_HEADER_KEY_VERSION) String apiKeyVersion,
       ApplyWithdrawApiRequest req)
       throws IOException, KucoinException;
 
@@ -58,6 +59,7 @@ public interface WithdrawalAPI {
       @HeaderParam(APIConstants.API_HEADER_SIGN) ParamsDigest signature,
       @HeaderParam(APIConstants.API_HEADER_TIMESTAMP) SynchronizedValueFactory<Long> nonce,
       @HeaderParam(APIConstants.API_HEADER_PASSPHRASE) String apiPassphrase,
+      @HeaderParam(APIConstants.API_HEADER_KEY_VERSION) String apiKeyVersion,
       @QueryParam("currency") String currency,
       @QueryParam("status") String status,
       @QueryParam("startAt") Long startAt,

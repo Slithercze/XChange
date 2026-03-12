@@ -52,4 +52,18 @@ public class KucoinDigest extends BaseParamsDigest {
   public String getSignature() {
     return signature;
   }
+
+  /**
+   * Encrypts the passphrase for KuCoin API v2 keys. The passphrase is signed with the secret key
+   * using HMAC-SHA256 and then base64-encoded.
+   */
+  public String encryptPassphrase(String passphrase) {
+    Mac mac256 = getMac();
+    try {
+      mac256.update(passphrase.getBytes(StandardCharsets.UTF_8));
+    } catch (Exception e) {
+      throw new ExchangeException("Passphrase encryption exception", e);
+    }
+    return Base64.getEncoder().encodeToString(mac256.doFinal());
+  }
 }
